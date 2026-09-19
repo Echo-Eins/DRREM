@@ -1,0 +1,8 @@
+.venv/
+data/raw/
+data/*.parquet
+__pycache__/
+*.pyc
+runs/
+.idea/
+data/tokenizer_qwen2.5/
