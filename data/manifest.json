@@ -1,0 +1,158 @@
+{
+  "created": "2026-09-18 08:18:36",
+  "seed": 20260918,
+  "sources": {
+    "openorca": "Open-Orca/OpenOrca/1M-GPT4-Augmented.parquet",
+    "gsm8k": "openai/gsm8k/main",
+    "qwen_tokenizer": "Qwen/Qwen2.5-1.5B"
+  },
+  "files": {
+    "data/openorca_100k.parquet": {
+      "sha256": "4dcc06e8237e6e6865bf9dd3f5496697964ddc75eb124e1e7f5e632241130e2c",
+      "bytes": 70425002
+    },
+    "data/gsm8k_train.parquet": {
+      "sha256": "6c212ef88ba65a4bd4b78c18a403f284dfe135bc0627a3614ec03b919f863c10",
+      "bytes": 1633615
+    },
+    "data/gsm8k_test.parquet": {
+      "sha256": "6e1dc1d6649f4d682802f8445f30c4e25e6db668c3418cfdc7a03c4323ae3d53",
+      "bytes": 300133
+    },
+    "data/tokenizer_qwen2.5/tokenizer.json": {
+      "sha256": "c0382117ea329cdf097041132f6d735924b697924d6f6fc3945713e96ce87539",
+      "bytes": 7031645
+    }
+  },
+  "qwen_vocab_size": 151665,
+  "stats_openorca_100k": {
+    "name": "openorca_100k",
+    "fields": {
+      "system_prompt": {
+        "docs": 100000,
+        "bytes_per_doc_mean": 125.6,
+        "bytes_per_doc_median": 109,
+        "bytes_per_doc_p95": 202,
+        "bytes_per_doc_max": 400
+      },
+      "question": {
+        "docs": 100000,
+        "bytes_per_doc_mean": 927.8,
+        "bytes_per_doc_median": 326,
+        "bytes_per_doc_p95": 2731,
+        "bytes_per_doc_max": 38033
+      },
+      "response": {
+        "docs": 100000,
+        "bytes_per_doc_mean": 702.6,
+        "bytes_per_doc_median": 444,
+        "bytes_per_doc_p95": 2456,
+        "bytes_per_doc_max": 6924
+      }
+    },
+    "joined": {
+      "docs": 100000,
+      "bytes_per_doc_mean": 1757.9,
+      "bytes_per_doc_median": 1326,
+      "bytes_per_doc_p95": 4017,
+      "bytes_per_doc_max": 38323,
+      "bytes_total": 175791498,
+      "unigram_entropy_bits_per_byte": 4.6448,
+      "bigram_cond_entropy_bits_per_byte": 3.6642,
+      "distinct_byte_values": 204,
+      "qwen": {
+        "tokens_total": 38569443,
+        "distinct_tokens_used": 78952,
+        "unigram_entropy_bits_per_token": 10.8294,
+        "tokens_per_doc_mean": 385.7,
+        "tokens_per_doc_median": 296,
+        "tokens_per_doc_p95": 862,
+        "tokens_per_doc_max": 8520
+      }
+    },
+    "id_prefixes": {
+      "flan": 50320,
+      "t0": 33283,
+      "niv": 8846,
+      "cot": 7551
+    }
+  },
+  "stats_gsm8k_train": {
+    "name": "gsm8k_train",
+    "fields": {
+      "question": {
+        "docs": 7473,
+        "bytes_per_doc_mean": 234.6,
+        "bytes_per_doc_median": 217,
+        "bytes_per_doc_p95": 414,
+        "bytes_per_doc_max": 991
+      },
+      "answer": {
+        "docs": 7473,
+        "bytes_per_doc_mean": 287.7,
+        "bytes_per_doc_median": 257,
+        "bytes_per_doc_p95": 562,
+        "bytes_per_doc_max": 1228
+      }
+    },
+    "joined": {
+      "docs": 7473,
+      "bytes_per_doc_mean": 523.3,
+      "bytes_per_doc_median": 485,
+      "bytes_per_doc_p95": 913,
+      "bytes_per_doc_max": 1692,
+      "bytes_total": 3910891,
+      "unigram_entropy_bits_per_byte": 4.9171,
+      "bigram_cond_entropy_bits_per_byte": 3.5027,
+      "distinct_byte_values": 121,
+      "qwen": {
+        "tokens_total": 1355910,
+        "distinct_tokens_used": 14137,
+        "unigram_entropy_bits_per_token": 7.925,
+        "tokens_per_doc_mean": 181.4,
+        "tokens_per_doc_median": 168,
+        "tokens_per_doc_p95": 312,
+        "tokens_per_doc_max": 536
+      }
+    }
+  },
+  "stats_gsm8k_test": {
+    "name": "gsm8k_test",
+    "fields": {
+      "question": {
+        "docs": 1319,
+        "bytes_per_doc_mean": 240.0,
+        "bytes_per_doc_median": 222,
+        "bytes_per_doc_p95": 431,
+        "bytes_per_doc_max": 848
+      },
+      "answer": {
+        "docs": 1319,
+        "bytes_per_doc_mean": 293.1,
+        "bytes_per_doc_median": 271,
+        "bytes_per_doc_p95": 555,
+        "bytes_per_doc_max": 1070
+      }
+    },
+    "joined": {
+      "docs": 1319,
+      "bytes_per_doc_mean": 534.1,
+      "bytes_per_doc_median": 499,
+      "bytes_per_doc_p95": 912,
+      "bytes_per_doc_max": 1619,
+      "bytes_total": 704499,
+      "unigram_entropy_bits_per_byte": 4.9124,
+      "bigram_cond_entropy_bits_per_byte": 3.5011,
+      "distinct_byte_values": 106,
+      "qwen": {
+        "tokens_total": 244625,
+        "distinct_tokens_used": 6645,
+        "unigram_entropy_bits_per_token": 7.847,
+        "tokens_per_doc_mean": 185.5,
+        "tokens_per_doc_median": 176,
+        "tokens_per_doc_p95": 312,
+        "tokens_per_doc_max": 519
+      }
+    }
+  }
+}
