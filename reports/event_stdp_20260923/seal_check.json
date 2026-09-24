@@ -1,0 +1,6 @@
+{
+  "returncode": 1,
+  "checkpoint_unchanged": true,
+  "sha256": "716031c64035b2a493881076ed5a342fd6e893a514ccc010d0bda3fe949f2527",
+  "error": "final test already opened; checkpoint is sealed"
+}

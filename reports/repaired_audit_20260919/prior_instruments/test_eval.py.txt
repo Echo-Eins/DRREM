@@ -1,0 +1,42 @@
+"""Честная оценка на документах, которые НЕ участвовали ни в обучении, ни в выборе темпа.
+Отложенный пул делится пополам по индексу: dev — первая половина (по ней я смотрела кривые),
+test — вторая, её не видел никто. Пересечение исключено по построению, а не по seed."""
+import math, sys, torch, torch.nn.functional as F
+from drrem.config import DataConfig
+from drrem.data.openorca import OpenOrcaBytes
+import drrem.rrem_repaired as R
+
+ck = torch.load(sys.argv[1], map_location="cuda", weights_only=False)
+m = R.RREM.from_checkpoint(ck["machine"], device="cuda")
+data = OpenOrcaBytes(DataConfig(resp_max=64, batch=32))
+# heldout_ids отсортированы по индексу в корпусе, а корпус сгруппирован по источникам —
+# деление пополам по индексу делит по ИСТОЧНИКУ, а не случайно. Перемешиваем фиксированным seed.
+import numpy as np
+ids = data.heldout_ids.copy()
+np.random.default_rng(20260919).shuffle(ids)
+dev_ids, test_ids = ids[: len(ids) // 2], ids[len(ids) // 2 :]
+assert len(set(dev_ids) & set(test_ids)) == 0
+rl = m.read_levels[-1]
+
+def оценить(doc_ids, n_batches=4, B=32):
+    ce = torch.zeros(m.cfg.H_pred, device="cuda", dtype=torch.float64); n = torch.zeros_like(ce)
+    for i in range(n_batches):
+        b = data.make_batch(doc_ids[i * B:(i + 1) * B]).to("cuda")
+        end = R.doc_end(b); st = m.init_state(b.x.shape[0])
+        for t in range(b.T - 1):
+            act = b.active[:, t]
+            if not bool(act.any()): continue
+            out = m.tick(st, m.input_drive(b.x[:, t]))
+            if t >= b.P - 1:
+                Y, V = R.targets(b.x, t, m.cfg.H_pred, b.P, end); V = V & act[:, None]
+                lg = m.logits(out["msgs"][-1], rl).double()
+                c = F.cross_entropy(lg.reshape(-1, 256), Y.reshape(-1), reduction="none").view(-1, m.cfg.H_pred)
+                ce += (c * V).sum(0); n += V.sum(0)
+            m.advance(st, out, act)
+    return (ce / n.clamp_min(1) / math.log(2)).tolist(), int(n[0])
+
+d, nd = оценить(dev_ids); tt, nt = оценить(test_ids)
+print(f"{sys.argv[1].split('/')[-1]}: обновлений {m.updates}")
+print(f"  dev  (по этой половине смотрелись кривые): h1={d[0]:.3f} среднее8={sum(d)/8:.3f}  байт {nd}")
+print(f"  test (не видел никто):                     h1={tt[0]:.3f} среднее8={sum(tt)/8:.3f}  байт {nt}")
+print(f"  расхождение dev↔test: {tt[0]-d[0]:+.3f} бита")

@@ -1,0 +1,41 @@
+{
+  "audit_date": "2026-09-19",
+  "environment": {
+    "python": "3.13.5",
+    "torch": "2.10.0+cpu",
+    "cuda_available": false
+  },
+  "claims": {
+    "OpenOrca_training_reproduced": false,
+    "GPU_tested": false,
+    "local_derivatives_tested": true,
+    "all_eight_heads_N256_L2_smoke_tested": true,
+    "original_sources_unchanged": true
+  },
+  "files": {
+    "AUDIT_RU.md": "9ff0e99efc56b818c9290beb21649b9203468138f31ecdd1fe2f6e05c54144a5",
+    "RESEARCH_ADDENDUM_RU.md": "47a98fbac492c6fa18893e09cad47338cd6b359536b2f009c083e963dc84f5a9",
+    "START_HERE_RU.md": "afc0e46556ea84409e8e5ed70a5205bed661e7d9b00203da82540202a85f75b1",
+    "evaluate_original_readonly.py": "cea3b96d1d8f74486f0b2cf141e0368af24248e59e66df37888b1f10edc4b63b",
+    "original/README.md": "dc1647b6e185874c9cbe74f96e446a21f3f71f82b6e5284af3f524026f0a7cc8",
+    "original/RESEARCH_PROGRAM.md": "8cb3751b5067eb48b9a09a54dbe88ef9e6e5d30c145a49b45da969487c69b8f8",
+    "original/rrem.py": "934ddd99a1ffc220fd9cd53125fa26223fca5bda91db8af91cb30b5d1eef5baa",
+    "results/full_credit_diagnostic.json": "7cd038f7a2bb8f1f9f1270b6b4b9dc23a5e2223b2e8c261ccdd74650b5963548",
+    "results/full_credit_diagnostic.stdout.txt": "a51dcce9659388b4017db898cdb5ca3a6d9bee5ede72cf8a5bd911a9b9e3a99d",
+    "results/interface_tests.json": "79cb12c13f92f0ba25ea521cc08cdb74fc8ab3984cf23d6a5011eeb97fc482b2",
+    "results/interface_tests.stdout.txt": "b2d5fef776cf1559375c463b0b002d19bb81880bd56bcd074de92f21dc01b905",
+    "results/legacy_control_tests.json": "f5d56d1998793b4983524d15e253c9f1372155d43b78bd9ec13efececb940403",
+    "results/legacy_control_tests.stdout.txt": "a568c0f50b40007bcd06902cc7b06dffad3d47f2c914feaf4d416751d0a7decc",
+    "results/original_audit.json": "9639be4bc9bf11ad99d98552f1fa48ad38f4915f390faa2eb6070a6cca2e5bea",
+    "results/original_audit.stdout.txt": "d11b4e9a48c4e96744362e963b43d7ff95e683a0b53a04c1f6eaaae416b33ed3",
+    "results/repaired_tests.json": "65e14aa811a948dd31f0a0913bd4f7c6e6ca1765e55e3276b656c80bf42d076e",
+    "results/repaired_tests.stdout.txt": "e86f9651776afe9d1a0556b1eaa721682806f0dffe3e8d1264ce368037242099",
+    "rrem_repaired.py": "fff443dd26bc9c663d878e226e5def999de863801e8f592346558f2da844f172",
+    "run_checks.sh": "e00d54d9d29ae475886b69d50af274b8918422e3cd5ab6de4d0c583823ae177f",
+    "tests/audit_original.py": "85aed0037b77807134d600669f3ab0b1316b103261dbe25ea393b80ca21e5f99",
+    "tests/diagnose_full_credit.py": "32c7354677cde88bb7efc8c38784fbfad09e9cb70562d88534d89ba4ef78fc4e",
+    "tests/test_interfaces.py": "9c1637313f3c155b9e39242199da39552c3b2d2ac249d663db13cc3e77c95bab",
+    "tests/test_legacy_control.py": "2cbcf0a5e3b5e2210394c0a67e88a5f0277852c9fa53381937a76dc2811f4f48",
+    "tests/test_repaired.py": "305abe67d221bd408fabbde0c3022f16c9cc990a1535108a95d957a9f7bd4912"
+  }
+}

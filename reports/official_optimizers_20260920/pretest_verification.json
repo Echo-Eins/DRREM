@@ -1,0 +1,93 @@
+{
+  "pilot_local_adam": {
+    "source_hashes_match": true,
+    "steps": 120,
+    "checkpoint_sha256": "9e359eeff0b7bceae7e73edc955acc5a2201e50cbd45d4c00ab0b04edca032aa",
+    "parameter_changes": {
+      "S": 2.31306791305542,
+      "A": 2.265456438064575,
+      "gate": 11.732866287231445,
+      "route_logits": 2.3655874729156494,
+      "route_slope": 1.631082534790039,
+      "theta": 0.4875049889087677
+    }
+  },
+  "pilot_local_muon": {
+    "source_hashes_match": true,
+    "steps": 120,
+    "checkpoint_sha256": "98c456f92b86d009449773549615e9c8fd3f5d9742f409e60f6ffb64bc125d61",
+    "parameter_changes": {
+      "S": 8.375380516052246,
+      "A": 8.342930793762207,
+      "gate": 12.467617988586426,
+      "route_logits": 1.9894622564315796,
+      "route_slope": 1.5231719017028809,
+      "theta": 0.31949517130851746
+    }
+  },
+  "local_muon_whole": {
+    "source_hashes_match": true,
+    "steps": 120,
+    "checkpoint_sha256": "f361a5d3cf2dc16c933df09c7475b5ff8871d4cfc0e9ec3f031c8849469036f5",
+    "parameter_changes": {
+      "S": 7.413794994354248,
+      "A": 7.479331016540527,
+      "gate": 13.354561805725098,
+      "route_logits": 1.8970686197280884,
+      "route_slope": 1.6499615907669067,
+      "theta": 0.3062664270401001
+    }
+  },
+  "pilot_global_adam": {
+    "source_hashes_match": true,
+    "steps": 120,
+    "checkpoint_sha256": "b1d62b0186cb2809b2a50ad026c82a9fd023a1aae71ccde562194940f8116976",
+    "parameter_changes": {
+      "S": 2.3140594959259033,
+      "A": 2.5330231189727783,
+      "gate": 11.59487533569336,
+      "route_logits": 2.1799087524414062,
+      "route_slope": 1.4574427604675293,
+      "theta": 0.40253299474716187
+    }
+  },
+  "pilot_global_muon": {
+    "source_hashes_match": true,
+    "steps": 120,
+    "checkpoint_sha256": "8bdc2ccc8a86fb7e7f650e851e1489e5edc83bce3fa8106971c14d5fe8c14854",
+    "parameter_changes": {
+      "S": 7.344979763031006,
+      "A": 7.412435531616211,
+      "gate": 13.028406143188477,
+      "route_logits": 1.7403525114059448,
+      "route_slope": 1.575040578842163,
+      "theta": 0.3020919859409332
+    }
+  },
+  "pilot_contrast_adam": {
+    "source_hashes_match": true,
+    "steps": 120,
+    "checkpoint_sha256": "70c6dcbaed70c9555d09e1cc9582462b10f00def63645439e5ebd9bfdc6527dd",
+    "parameter_changes": {
+      "S": 2.482496976852417,
+      "A": 2.467806816101074,
+      "gate": 12.536500930786133,
+      "route_logits": 2.3625850677490234,
+      "route_slope": 1.5590531826019287,
+      "theta": 0.40909895300865173
+    }
+  },
+  "local_frozen": {
+    "source_hashes_match": true,
+    "steps": 120,
+    "checkpoint_sha256": "5f45d65fa7444ae5b70c5a25b7e31ad70c5ca8df09a2eedc1f458e7b645d3743",
+    "parameter_changes": {
+      "S": 0.0,
+      "A": 0.0,
+      "gate": 0.0,
+      "route_logits": 0.0,
+      "route_slope": 0.0,
+      "theta": 0.0
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "tests.log": "431685ec950e81a0662b4f11843f87a0bcf5290676026a4f769107e23f451962",
+  "validation.json": "66abfc3ffc96f7ee94642f35770f57e5742d8f22aa0cc691b91a952365c55290",
+  "benchmark.jsonl": "ba81e7b4d74ac195192d77207859ea7e95faffa3aef1a3f84ce8a638f932f714",
+  "benchmark_chunked.jsonl": "6f24a5ea12011e08477035c14868dec8fcef458b90643b69753896e0dafb6170",
+  "launch.json": "2c7bc70cae69f4400645ac9c8c85794a2f1c2ce99d6e6eb489e14790ae7a3e77",
+  "REPORT_RU.md": "d02ca2c7e919ea114e07b4099f0ba2ea5b1a4967583828ed5d8009cae5e3fa7c",
+  "verification/audit_large.py": "a72b78513478efe71987cc6a61cd20cd9416e786176837423305e28d3f19086c",
+  "verification/tests/test_event_stdp.py": "a577315b7986c402c2eafac73021943f1dfc0033f9b9c53320f8085dc94e41c8",
+  "verification/tests/test_last_decoder.py": "611e4a7ea904745423029349367228818e152c14ce1ab2abb213c00f36723ed5",
+  "verification/scripts/benchmark_spiking_scale.py": "27a506e101525127b96909c0fca7c44ad1f6c6b197ddbed4934350a1668951fe",
+  "large_audit.json": "00ab0001bc9795cb1da7a89cf456dc811eb1bceb1709b39ea334b18df6a873a4",
+  "checkpoint_verification.json": "b7af6e70f7684320ec74ebc6de82bdd584a511b558518adced2e5fcf41da798b"
+}

@@ -1,0 +1,69 @@
+"""Прибор: сколько стоит косвенный путь через такты. Усечение на k тактов, автоград ТОЛЬКО как
+измеритель (как автоград-двойник в проекте). k=1 — ровно область, где локальное правило точно."""
+import math, sys, torch, torch.nn.functional as F
+from drrem.config import DataConfig
+from drrem.data.openorca import OpenOrcaBytes
+import drrem.rrem_repaired as R
+
+k = int(sys.argv[1]); steps = int(sys.argv[2]) if len(sys.argv) > 2 else 150
+cfg = R.Cfg(N=128, L=2, H_pred=2, hops=4, device="cuda", readout_levels="last", bb=False)
+m = R.RREM(cfg)
+params = [m.S, m.A, m.E, m.E_bias]
+for p in params: p.requires_grad_(True)
+opt = torch.optim.Adam(params, lr=3e-3)
+data = OpenOrcaBytes(DataConfig(resp_max=64, batch=16))
+it = data.train_batches(11, 16)
+ev = [b.to("cuda") for b in data.heldout_batches(2, 16, seed=2)]
+rl = cfg.L - 1
+
+def перенос(st, out, grad=True):
+    msg = out["msgs"][-1]
+    st.u = out["u"]; st.msg = msg
+    dec = m.decay[None, :, None]
+    st.traces = dec * st.traces + (1 - dec) * msg[:, None, :]
+    if m.max_lag: st.delays = torch.cat((msg[:, None], st.delays[:, :-1]), 1)
+    if not grad:
+        for f in ("u", "msg", "traces", "delays"): setattr(st, f, getattr(st, f).detach())
+
+@torch.no_grad()
+def оценка():
+    ce = n = 0.0
+    for b in ev:
+        end = R.doc_end(b); st = m.init_state(b.x.shape[0])
+        for t in range(b.T - 1):
+            act = b.active[:, t]
+            if not bool(act.any()): continue
+            out = m.tick(st, m.input_drive(b.x[:, t]))
+            if t >= b.P - 1:
+                Y, V = R.targets(b.x, t, cfg.H_pred, b.P, end); V = V & act[:, None]
+                lg = m.logits(out["msgs"][-1], rl)
+                c = F.cross_entropy(lg[:, 0], Y[:, 0], reduction="none")
+                ce += float((c * V[:, 0]).sum()); n += float(V[:, 0].sum())
+            перенос(st, out, grad=False)
+    return ce / max(n, 1) / math.log(2)
+
+print(f"k={k}: старт {оценка():.3f}", flush=True)
+for step in range(1, steps + 1):
+    b = next(it).to("cuda"); end = R.doc_end(b)
+    st = m.init_state(b.x.shape[0])
+    with torch.no_grad():
+        for t in range(b.P - 1):
+            act = b.active[:, t]
+            if bool(act.any()): перенос(st, m.tick(st, m.input_drive(b.x[:, t])), grad=False)
+    acc, cnt = 0.0, 0
+    for t in range(b.P - 1, b.T - 1):
+        act = b.active[:, t]
+        if not bool(act.any()): break
+        out = m.tick(st, m.input_drive(b.x[:, t]))
+        Y, V = R.targets(b.x, t, cfg.H_pred, b.P, end); V = V & act[:, None]
+        lg = m.logits(out["msgs"][-1], rl)
+        c = F.cross_entropy(lg[:, 0], Y[:, 0], reduction="none")
+        acc = acc + (c * V[:, 0]).sum(); cnt += int(V[:, 0].sum())
+        перенос(st, out, grad=True)
+        if (t - (b.P - 1) + 1) % k == 0:
+            (acc / max(cnt, 1)).backward(); opt.step(); opt.zero_grad(set_to_none=True)
+            with torch.no_grad():
+                m.S.copy_(R.project(m.S, 1, m.mask)); m.A.copy_(R.project(m.A, -1, m.mask))
+            for f in ("u", "msg", "traces", "delays"): setattr(st, f, getattr(st, f).detach())
+            acc, cnt = 0.0, 0
+    if step % 50 == 0: print(f"  k={k} шаг {step}: {оценка():.3f}", flush=True)

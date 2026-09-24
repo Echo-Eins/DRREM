@@ -1,0 +1,35 @@
+{
+  "shape_checks": "passed on actual large checkpoint",
+  "encoder_shape": [
+    256,
+    1024
+  ],
+  "readout_shape": [
+    8,
+    256,
+    1024
+  ],
+  "S_A_shape": [
+    4,
+    3072,
+    3072
+  ],
+  "permitted_edges_per_delay": 7336960,
+  "accidental_zero_S_plus_A_on_trainable_edges": [
+    {
+      "delay_index": 1,
+      "post": 715,
+      "pre": 184,
+      "S": 0.003630527760833502,
+      "A": -0.003630527760833502
+    }
+  ],
+  "trainable_parameter_count": 77596672,
+  "source_hashes_match": true,
+  "planned_batches": 308,
+  "planned_padded_byte_positions": 458964,
+  "checkpoint_updates": 0,
+  "completed_batches": 3,
+  "seen_response_bytes": 46187,
+  "estimated_training_hours_excluding_eval": 7.305696960213276
+}

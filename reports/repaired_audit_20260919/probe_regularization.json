@@ -1,0 +1,74 @@
+{
+  "fixed_all": {
+    "0.01": {
+      "train_h1_bpb": 2.209514856338501,
+      "dev_h1_bpb": 4.565211772918701,
+      "closure_calls": 106,
+      "regularized_objective": 1.9037256240844727,
+      "objective_gradient_norm": 0.0013465680412652046,
+      "ridge": 0.01
+    },
+    "0.1": {
+      "train_h1_bpb": 3.5520668029785156,
+      "dev_h1_bpb": 4.530628681182861,
+      "closure_calls": 106,
+      "regularized_objective": 2.774296522140503,
+      "objective_gradient_norm": 0.0006798632558041617,
+      "ridge": 0.1
+    }
+  },
+  "fixed_all_reset_SA": {
+    "0.01": {
+      "train_h1_bpb": 2.20200252532959,
+      "dev_h1_bpb": 4.60688591003418,
+      "closure_calls": 105,
+      "regularized_objective": 1.9008402824401855,
+      "objective_gradient_norm": 0.0009757801084540627,
+      "ridge": 0.01
+    },
+    "0.1": {
+      "train_h1_bpb": 3.5508861541748047,
+      "dev_h1_bpb": 4.5497355461120605,
+      "closure_calls": 106,
+      "regularized_objective": 2.7735602855682373,
+      "objective_gradient_norm": 0.0009715581379023442,
+      "ridge": 0.1
+    }
+  },
+  "last_clean_current": {
+    "0.01": {
+      "train_h1_bpb": 2.2211451530456543,
+      "dev_h1_bpb": 4.520139694213867,
+      "closure_calls": 105,
+      "regularized_objective": 1.9173321723937988,
+      "objective_gradient_norm": 0.0012672273366116334,
+      "ridge": 0.01
+    },
+    "0.1": {
+      "train_h1_bpb": 3.5770373344421387,
+      "dev_h1_bpb": 4.533779144287109,
+      "closure_calls": 107,
+      "regularized_objective": 2.785191297531128,
+      "objective_gradient_norm": 0.0007537697549841317,
+      "ridge": 0.1
+    }
+  },
+  "last_clean_without_new_adaptation": {
+    "0.01": {
+      "train_h1_bpb": 2.2484078407287598,
+      "dev_h1_bpb": 4.417893886566162,
+      "closure_calls": 104,
+      "regularized_objective": 1.9306282997131348,
+      "objective_gradient_norm": 0.0008294779047946383,
+      "ridge": 0.01
+    },
+    "0.1": {
+      "train_h1_bpb": 3.585132360458374,
+      "dev_h1_bpb": 4.504786968231201,
+      "closure_calls": 108,
+      "regularized_objective": 2.788311004638672,
+      "objective_gradient_norm": 0.0005723043692535865,
+      "ridge": 0.1
+    }
+  }
+}

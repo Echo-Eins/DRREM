@@ -1,0 +1,29 @@
+{
+  "trials": {
+    "pilot_local_adam": {
+      "checkpoint_sha256_before_test": "9e359eeff0b7bceae7e73edc955acc5a2201e50cbd45d4c00ab0b04edca032aa"
+    },
+    "pilot_local_muon": {
+      "checkpoint_sha256_before_test": "98c456f92b86d009449773549615e9c8fd3f5d9742f409e60f6ffb64bc125d61"
+    },
+    "pilot_global_adam": {
+      "checkpoint_sha256_before_test": "b1d62b0186cb2809b2a50ad026c82a9fd023a1aae71ccde562194940f8116976"
+    },
+    "pilot_global_muon": {
+      "checkpoint_sha256_before_test": "8bdc2ccc8a86fb7e7f650e851e1489e5edc83bce3fa8106971c14d5fe8c14854"
+    },
+    "pilot_contrast_adam": {
+      "checkpoint_sha256_before_test": "70c6dcbaed70c9555d09e1cc9582462b10f00def63645439e5ebd9bfdc6527dd"
+    },
+    "local_muon_whole": {
+      "checkpoint_sha256_before_test": "f361a5d3cf2dc16c933df09c7475b5ff8871d4cfc0e9ec3f031c8849469036f5"
+    },
+    "local_frozen": {
+      "checkpoint_sha256_before_test": "5f45d65fa7444ae5b70c5a25b7e31ad70c5ca8df09a2eedc1f458e7b645d3743"
+    },
+    "global_frozen": {
+      "checkpoint_sha256_before_test": "978153f29cc33433ef6e4f9a6237cc44c9d810ee53df3fbf5a62af8ed71fdd60"
+    }
+  },
+  "selection": "All eight predeclared endpoints, no training after test."
+}

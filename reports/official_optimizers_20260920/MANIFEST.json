@@ -1,0 +1,271 @@
+{
+  "artifacts": {
+    "RESULTS.md": {
+      "bytes": 19468,
+      "sha256": "3c74bb214bfe03a2d153986480ef7e1dfb651e2e5a4178e0e8051f8c884d1820"
+    },
+    "blocked_resume.log": {
+      "bytes": 448,
+      "sha256": "885d1cc4d138954ee57373ddbfe5c6b0618a150055d7391126fab6f21c2fa0cd"
+    },
+    "comparison.png": {
+      "bytes": 248435,
+      "sha256": "30dfc6e18ab643f09f5124f94e140cf41fb0b7bb01a2a338ac791ca9e2a881f8"
+    },
+    "comparison.svg": {
+      "bytes": 80349,
+      "sha256": "786afb86b5ce0277e51d4fc9ae135eba1654320609f6f38e057db126ab8d56f0"
+    },
+    "comparison_plan.json": {
+      "bytes": 1549,
+      "sha256": "20ce61c88d83e2fd2c527570d09652d711f45c5810b22b9beb24008d6df596ea"
+    },
+    "diagnostics.json": {
+      "bytes": 25041,
+      "sha256": "f7fb77c7d98f8116b68b08640121ae9bf75206567ad5ae4ebf5b96b5e3251cb3"
+    },
+    "final_test_plan.json": {
+      "bytes": 1205,
+      "sha256": "62c4c975ab0e4866ebbd579e1bcb29b92b49d59cdcef096129f03b5890c99d49"
+    },
+    "global_frozen/checkpoint.pt": {
+      "bytes": 27382645,
+      "sha256": "f1c068e893b2c6df382960c3c38b08185b09d69bcdfc6207db3eebeba2494d7c"
+    },
+    "global_frozen/metrics.jsonl": {
+      "bytes": 147677,
+      "sha256": "d59fa24f246465e391b18aedd519c3fbb4fbf8d1a9a98f67e17d422d1c9193c7"
+    },
+    "global_frozen/protocol.json": {
+      "bytes": 2888747,
+      "sha256": "532908eabadd82430d57c34cdbbc5c044a55381881670b7e733d24675890ce63"
+    },
+    "global_frozen/test_plan.json": {
+      "bytes": 333,
+      "sha256": "aa0f3825f9de6e0468e5664a79ca54ec74e7057b11b1a60a1f3bb466079ddf60"
+    },
+    "global_frozen.stdout.log": {
+      "bytes": 5918,
+      "sha256": "03af49638bb4e45870ff9ad9c2a646a2a31dca9cfa99d993ddee3776c6549bf5"
+    },
+    "initial_copy_diagnostic.json": {
+      "bytes": 376,
+      "sha256": "c85aeed9867c362649f63d237c56b04611b4d81ff05256b8fbe0beda69eb7b55"
+    },
+    "local_frozen/checkpoint.pt": {
+      "bytes": 27382645,
+      "sha256": "65450906938389e0c95641f8bfbb706483648d8de48d37eab0a06cf0bfe23577"
+    },
+    "local_frozen/metrics.jsonl": {
+      "bytes": 147638,
+      "sha256": "89bc8d46a346a522bd32d797df962b2ca4d37633d8d7e7a39d8e3768d5d460c6"
+    },
+    "local_frozen/protocol.json": {
+      "bytes": 2888745,
+      "sha256": "9d920e0332f6e8c0cc6dda49c3b6fb20c2532e672c7f8bd7e6cdf3d2167ac806"
+    },
+    "local_frozen/test_plan.json": {
+      "bytes": 331,
+      "sha256": "960b7eecda67fc3b66d4544c7e6e0c8093a6459e6430e923b75c70d687025963"
+    },
+    "local_frozen.stdout.log": {
+      "bytes": 5922,
+      "sha256": "aaef1efb23a60064aafdf1f76190584cb57b5bc29d03ceb6ae3dfda92eefee70"
+    },
+    "local_muon_whole/checkpoint.pt": {
+      "bytes": 48380917,
+      "sha256": "9a3f2a0d1913bf60204d7b99bdd63b297c15fa2673e2afe66adc8e8b7bdc9f07"
+    },
+    "local_muon_whole/metrics.jsonl": {
+      "bytes": 173166,
+      "sha256": "9e122c56a08c13b30f39882d023fa903291cd3ece401b2af18975b4a9dd21842"
+    },
+    "local_muon_whole/protocol.json": {
+      "bytes": 2888691,
+      "sha256": "b81f3861dec723ef36b423d4be474ec26fec63b55190a061ab42b16b5ca2eabd"
+    },
+    "local_muon_whole/test_plan.json": {
+      "bytes": 332,
+      "sha256": "53ff75747e1bc66290c0264437c88313929e27c9dbc0e9f49637b186af647ac2"
+    },
+    "local_muon_whole.stdout.log": {
+      "bytes": 5916,
+      "sha256": "fa2f2e7e80567a062d315c013f044a18f402ed7c307b2a6b58bda5269ab182a1"
+    },
+    "pilot_contrast_adam/checkpoint.pt": {
+      "bytes": 67285983,
+      "sha256": "cad50b9944510068d1fa87fe9f57b239c1662a2cafc9301390ba62311326a38b"
+    },
+    "pilot_contrast_adam/metrics.jsonl": {
+      "bytes": 173510,
+      "sha256": "a54619915eac8f777d9a71dcac4e63274b0e1d226f8e5a8bdee359ba575d5a87"
+    },
+    "pilot_contrast_adam/protocol.json": {
+      "bytes": 2888693,
+      "sha256": "6ed230020c084bc7ff7ab06475ea0f8f09877fcbc13ab023d5e324b224b9bf28"
+    },
+    "pilot_contrast_adam/test_plan.json": {
+      "bytes": 334,
+      "sha256": "dc58f68c7fcab9b01bb7e74f874cd9acc0d24b365cf6787ad278b81aa63e3899"
+    },
+    "pilot_contrast_adam.stdout.log": {
+      "bytes": 4171,
+      "sha256": "b65355acfc108ee58c69a6a0885577551f8d4658ca9d6df42feb89552c7477f2"
+    },
+    "pilot_global_adam/checkpoint.pt": {
+      "bytes": 67265269,
+      "sha256": "084742da4e2b7d01a506c3be406bd92880dfaa0d6fd9fb6a3e358c9a71118af6"
+    },
+    "pilot_global_adam/metrics.jsonl": {
+      "bytes": 175427,
+      "sha256": "86311fcc6e67774d93b75d03fa2980f6ba958d7c345512a12abb3cca9eed159d"
+    },
+    "pilot_global_adam/protocol.json": {
+      "bytes": 2888692,
+      "sha256": "a97d59021452b006c65f5ab074dbcd906e83142d6910e81c559e13a2e8e5146a"
+    },
+    "pilot_global_adam/test_plan.json": {
+      "bytes": 333,
+      "sha256": "e4051b52a8c15100b0fb750220f2bae4da8901b16f25a6112a724b48b567f33d"
+    },
+    "pilot_global_adam.stdout.log": {
+      "bytes": 4162,
+      "sha256": "ef4ab2a0dd345bc7d68be9dc5aaf1e84ebe1bc2d672c3809ea3292970493af91"
+    },
+    "pilot_global_muon/checkpoint.pt": {
+      "bytes": 48380917,
+      "sha256": "b4393488a9519ee32dc784eb1df254dd82a396a8da788dec9eb3bf9270e713e6"
+    },
+    "pilot_global_muon/metrics.jsonl": {
+      "bytes": 175306,
+      "sha256": "a5e5b4aa3c084c2ec05e7fb0919f9c1656c74ff65da5fb2b83e12979097b694c"
+    },
+    "pilot_global_muon/protocol.json": {
+      "bytes": 2888692,
+      "sha256": "eb33d6a0437b9eb1c3d4fd1d10275a8ee51b76136314e164868752de0df0aef1"
+    },
+    "pilot_global_muon/test_plan.json": {
+      "bytes": 333,
+      "sha256": "b28e250abc54de9071744e86c8b7263635898ee7ce8b15b04ffe7e92055df370"
+    },
+    "pilot_global_muon.stdout.log": {
+      "bytes": 4164,
+      "sha256": "e731d2e171d56026e36e0be6f99f318d1e42976f12803b45861b496040e94c3b"
+    },
+    "pilot_local_adam/checkpoint.pt": {
+      "bytes": 67285919,
+      "sha256": "4ddfbfb49293a131e4450ea4f7d94ba19189c28bfd0de30c8b3c51b62fa539f0"
+    },
+    "pilot_local_adam/metrics.jsonl": {
+      "bytes": 175462,
+      "sha256": "455e4309e910c239fbd3b7e994710916ee7500ed07a6e3620ec0c815beeb6ae3"
+    },
+    "pilot_local_adam/protocol.json": {
+      "bytes": 2888690,
+      "sha256": "577e43c42157a16ee843aac7ee95e37c608c4edfd27edf373f0d25f2f70a6904"
+    },
+    "pilot_local_adam/test_plan.json": {
+      "bytes": 331,
+      "sha256": "9cd2c9cd77e2a641f1aabae4f7ea37f88a607e8624ce7116b9e6cc3f3bd06370"
+    },
+    "pilot_local_adam.stdout.log": {
+      "bytes": 4163,
+      "sha256": "8671fb88f1687129d8ad6f2209491903d4469951e7868a885872c9bb6d71dbca"
+    },
+    "pilot_local_muon/checkpoint.pt": {
+      "bytes": 48391349,
+      "sha256": "379c89d87310b5739c510dc5fc4705597b9cbe2902a373e91726e325d9a1dd82"
+    },
+    "pilot_local_muon/metrics.jsonl": {
+      "bytes": 175401,
+      "sha256": "f89870c894ddf7158d4cf6cd6f31e399cfccc1d47e34d98bea9aaff96536eabc"
+    },
+    "pilot_local_muon/protocol.json": {
+      "bytes": 2888690,
+      "sha256": "0f224f98b2a182968b66139a7c4949d1d5553a19f93708eeb208607a76f45a07"
+    },
+    "pilot_local_muon/test_plan.json": {
+      "bytes": 331,
+      "sha256": "56e147a9a512daab32bc29073769e2e90e33b2ba8512fa5893b474b8a770bb0b"
+    },
+    "pilot_local_muon.stdout.log": {
+      "bytes": 4175,
+      "sha256": "43b3f589333764e41ba4b5a2ba999dc55aa166297b0ef9d6e8348b9915d3d380"
+    },
+    "posttest_verification.json": {
+      "bytes": 1458,
+      "sha256": "c2eb704107d178b2724946dd99415cd5d1533cabece2777b88e07330c547bea3"
+    },
+    "pretest_verification.json": {
+      "bytes": 2835,
+      "sha256": "09715d012de7c9232e6a7a9f90c0f8a28bc31055af96533034e18372be895e6a"
+    },
+    "source_snapshot/drrem/config.py": {
+      "bytes": 8799,
+      "sha256": "6933822faa211e4d1dd0be6b002844006adef70dcda6e96152a2543218d4a008"
+    },
+    "source_snapshot/drrem/core/energy_optimization.py": {
+      "bytes": 12704,
+      "sha256": "79a9a31803c5be637b6da5147f9e7cc1960b53fc507525fe6cde7fe019ac4ea4"
+    },
+    "source_snapshot/drrem/core/predictive_energy.py": {
+      "bytes": 13938,
+      "sha256": "c64dd6eb116e449c3741e64b3f96aa55c9de383b1b4365df36fc9981b0370892"
+    },
+    "source_snapshot/drrem/data/openorca.py": {
+      "bytes": 6508,
+      "sha256": "f9e39f5dd679d252c01a11e22f1d818c195b708b56381159d27fe30533a37ed4"
+    },
+    "source_snapshot/drrem/data/protocol.py": {
+      "bytes": 3350,
+      "sha256": "dc25cc0643bc4390402b9408ef254aa0071ce335ee84a82267b388949399ec7b"
+    },
+    "source_snapshot/drrem/rrem_repaired.py": {
+      "bytes": 58189,
+      "sha256": "3f0c3be3e30d7186f9e385cadb4f7a161b13f61659dd58c9e291d92c384121c1"
+    },
+    "source_snapshot/scripts/assess_predictive_energy.py": {
+      "bytes": 5672,
+      "sha256": "30627b525bf45cca48b92acc58deed1b2dfbfe94c072853a30fa3537c072f337"
+    },
+    "source_snapshot/scripts/compare_energy_optimizers.py": {
+      "bytes": 6024,
+      "sha256": "e5f9ce4c9818ef3699d001816b697c468d6972dfbdfd745e6a0592db55b52571"
+    },
+    "source_snapshot/scripts/inspect_energy_optimizers.py": {
+      "bytes": 4075,
+      "sha256": "4051a8ff530fc5542c90e00da86d58798eba319a07401cce356d7579d289b167"
+    },
+    "source_snapshot/scripts/summarize_energy_optimizers.py": {
+      "bytes": 4890,
+      "sha256": "519a3d2ab3bab51c859d82a015b944422a1323af6df3b266bd3d67b196f27105"
+    },
+    "source_snapshot/tests/test_energy_optimization.py": {
+      "bytes": 6152,
+      "sha256": "02c5ba890689ddfb906a7b88a4513668edd2a23154db5f46f99a936e3c0c08c3"
+    },
+    "source_snapshot/tests/test_predictive_energy.py": {
+      "bytes": 12451,
+      "sha256": "7889427dbcdea5108198486cef9ae95bd87edb3f8bf4205d794d7855c6209fb0"
+    },
+    "summary.json": {
+      "bytes": 12074,
+      "sha256": "a3e594f442dbc0ffe53d67d4139db9a36349d888b54e13c64d35d042925a98c5"
+    },
+    "table.md": {
+      "bytes": 838,
+      "sha256": "f32efe22d8ba21a97df7234728e606d8aa143cdf9d0584c9c706c9d0fa6749a3"
+    },
+    "test_unigram.json": {
+      "bytes": 375,
+      "sha256": "e20d926d5dce8e3a48e74e15f19ddfb1e4486753d7e08b42778acbb657cf1414"
+    },
+    "tests.log": {
+      "bytes": 4648,
+      "sha256": "f731d93f0b8c07b7cccdab7777ab93acf0dda7bf79bde836b3f58e04a72d903f"
+    }
+  },
+  "torch": "2.11.0+cu130",
+  "gpu": "NVIDIA GB10",
+  "test_opened_after_all_training": true
+}

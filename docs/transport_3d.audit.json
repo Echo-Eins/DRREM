@@ -1,0 +1,96 @@
+{
+  "config": {
+    "neurons": 128,
+    "layers": 3,
+    "hops": 8,
+    "heads": 8,
+    "expansion": 2,
+    "horizons": 8,
+    "history": "attention",
+    "hop_rule": "residual",
+    "rotary": true,
+    "checkpoint_hops": false,
+    "vocab": 257,
+    "window": 0
+  },
+  "seed": 230923,
+  "source_hashes": {
+    "drrem/core/causal_transport.py": "ae1b872ea0ac889727182e910c520cc0af9e805ec7f29d0c87c0bfb246a53388",
+    "drrem/core/identity_bridge.py": "9129bf6d32e1610b61e74ef34f9a79180fe50aa1f9a82d843babb31c5f0741e8",
+    "drrem/core/synaptic_basis.py": "0326443b65fd6e2a9986f24b0e1a4017609260ea57096f18310a6c5d327fb7a3",
+    "drrem/core/ridge_metric.py": "a513bc6238f3a2e360c327cf09f9b857eb4450b589889ed8e9555b85541e7ba5",
+    "drrem/core/ridge_plasticity.py": "5dd9bdc7ec4c669342ae0ba4941ef90bd1310b274a58c963e463f58988630349",
+    "drrem/diagnostics/transport_view.py": "42779dd4c7533c4677d85dbecbb144762c5c548cca3ec3c7a4a0a28d7da31fc6",
+    "scripts/build_transport_view.py": "3a1e2d5343fe5175c0d4674572fbb2a1b51267cc81a5ea0841602dd39b7810bd"
+  },
+  "variants": {
+    "base": {
+      "edge_sum": 1.0728836059570312e-06,
+      "field_norm_input": 0.0,
+      "mlp_output": 0.0,
+      "hop_state": 0.0,
+      "attention_output": 1.7881393432617188e-07,
+      "decoder": 0.0,
+      "future_invariance": 0.0,
+      "observation_changes_output": false,
+      "forbidden_attention_mass": 0.0,
+      "recorded_hops": 8,
+      "positions": 14
+    },
+    "bridges_zero": {
+      "edge_sum": 1.0728836059570312e-06,
+      "field_norm_input": 0.0,
+      "mlp_output": 0.0,
+      "hop_state": 0.0,
+      "attention_output": 1.7881393432617188e-07,
+      "decoder": 0.0,
+      "future_invariance": 0.0,
+      "observation_changes_output": false,
+      "forbidden_attention_mass": 0.0,
+      "recorded_hops": 8,
+      "positions": 14
+    },
+    "bridges_open": {
+      "edge_sum": 1.1920928955078125e-06,
+      "field_norm_input": 0.0,
+      "mlp_output": 0.0,
+      "hop_state": 0.0,
+      "attention_output": 1.7881393432617188e-07,
+      "decoder": 0.0,
+      "future_invariance": 0.0,
+      "observation_changes_output": false,
+      "forbidden_attention_mass": 0.0,
+      "recorded_hops": 8,
+      "positions": 14
+    },
+    "kan_zero": {
+      "edge_sum": 1.0728836059570312e-06,
+      "field_norm_input": 0.0,
+      "mlp_output": 0.0,
+      "hop_state": 0.0,
+      "attention_output": 1.7881393432617188e-07,
+      "decoder": 0.0,
+      "future_invariance": 0.0,
+      "observation_changes_output": false,
+      "forbidden_attention_mass": 0.0,
+      "recorded_hops": 8,
+      "positions": 14
+    },
+    "kan_probe": {
+      "edge_sum": 1.0728836059570312e-06,
+      "field_norm_input": 0.0,
+      "mlp_output": 0.0,
+      "hop_state": 0.0,
+      "attention_output": 1.7881393432617188e-07,
+      "decoder": 0.0,
+      "future_invariance": 0.0,
+      "observation_changes_output": false,
+      "forbidden_attention_mass": 0.0,
+      "recorded_hops": 8,
+      "positions": 14
+    }
+  },
+  "html_bytes": 29526030,
+  "template_sha256": "807a9317799ea1acc71a8247157578b5f54a2f521da421b60e31daf738d5e1e3",
+  "honesty": "Fresh 128-wide actual models; no trained checkpoint, no hidden aggregation, no learning claims."
+}

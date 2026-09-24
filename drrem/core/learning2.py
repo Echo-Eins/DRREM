@@ -123,6 +123,22 @@ def memory_swap(machine: MachineV2, state: State, I, active, phase: PhaseConfig,
     return (float(rel.median()) if rel.numel() else float("nan")), dC
 
 
+def bootstrap_bpb(sums: list[float], counts: list[float], n_boot: int = 2000, seed: int = 0) -> tuple[float, float]:
+    """Биты на байт и их σ бутстрапом ПО ДОКУМЕНТАМ. Байты внутри документа коррелируют, поэтому
+    наивная оценка «байты независимы» занижает σ примерно вдвое (измерено: 0,010 против 0,024 на
+    192 документах). Без этой величины различия прогонов меньше ~0,07 бита неотличимы от шума."""
+    import numpy as np
+
+    s, c = np.asarray(sums, dtype=np.float64), np.asarray(counts, dtype=np.float64)
+    if s.size == 0 or c.sum() <= 0:
+        return float("nan"), float("nan")
+    point = s.sum() / c.sum() / math.log(2)
+    rng = np.random.default_rng(seed)
+    idx = rng.integers(0, s.size, (n_boot, s.size))
+    draws = s[idx].sum(1) / np.maximum(c[idx].sum(1), 1e-9) / math.log(2)
+    return float(point), float(draws.std())
+
+
 def _segment_flags(bytes_col: torch.Tensor) -> torch.Tensor:
     return torch.tensor([int(b) in SEGMENT_BYTES for b in bytes_col.tolist()], device=bytes_col.device)
 
@@ -143,6 +159,8 @@ def evaluate2(machine: MachineV2, batches: list[Batch], phase: PhaseConfig, gen_
     n_state = 0
     mems: list[float] = []
     dcs: list[float] = []
+    doc_ce: list[float] = []  # суммы нат уровня 1 горизонта 1 по документам — для бутстрапа σ
+    doc_n: list[float] = []
     jrs: list[float] = []
     fps: list[float] = []
     gen = torch.Generator().manual_seed(gen_seed)
@@ -150,6 +168,8 @@ def evaluate2(machine: MachineV2, batches: list[Batch], phase: PhaseConfig, gen_
         batch = batch.to(machine.device)
         end = doc_end(batch)
         state = run_prompt2(machine, batch, phase)
+        ce_b = torch.zeros(batch.x.shape[0], device=machine.device)
+        n_b = torch.zeros(batch.x.shape[0], device=machine.device)
         for t in range(batch.P - 1, batch.T - 1):
             act = batch.active[:, t]
             if not bool(act.any()):
@@ -176,6 +196,8 @@ def evaluate2(machine: MachineV2, batches: list[Batch], phase: PhaseConfig, gen_
                 ce_sum[l, : len(cols)] += (terms[:, l, : len(cols)] * w).sum(0)
                 ce_cnt[l, : len(cols)] += w.sum(0)
             m1 = act & V[:, 0]
+            ce_b += terms[:, 0, 0] * m1.to(terms.dtype)
+            n_b += m1.to(terms.dtype)
             if bool(m1.any()):
                 hc = torch.stack([machine.loss_terms(s, Y, V)[m1, 0, 0].sum() for s in traj[1:]])
                 hop_curve = hc if hop_curve is None else hop_curve + hc
@@ -187,14 +209,20 @@ def evaluate2(machine: MachineV2, batches: list[Batch], phase: PhaseConfig, gen_
                 ticks_seg[l] += int((tk & seg).sum())
             steps += int(act.sum())
             seg_steps += int(seg.sum())
-            sat += float((s0[um] >= 1).float().mean()) * int(act.sum())
-            act_frac += float((s0[um] > 0).float().mean()) * int(act.sum())
+            sat += float(machine.saturated(x_free)[um].float().mean()) * int(act.sum())
+            act_frac += float(machine.active(x_free)[um].float().mean()) * int(act.sum())
             n_state += int(act.sum())
             advance(machine, state, s0, x_free, um, batch.x[:, t + 1], act, False)
+        keep = n_b > 0
+        doc_ce += ce_b[keep].tolist()
+        doc_n += n_b[keep].tolist()
     bpb = (ce_sum / ce_cnt.clamp_min(1) / math.log(2)).tolist()
+    _, sigma = bootstrap_bpb(doc_ce, doc_n)
     out = {
         "bpb_level_horizon": [[round(v, 4) for v in row[: len(cfg.horizons[l])]] for l, row in enumerate(bpb)],
         "bpb_h1": bpb[0][0],
+        "bpb_h1_sigma": sigma,  # σ бутстрапа по документам; различия меньше ~3σ читать нельзя
+        "eval_docs": len(doc_n),
         "hop_curve_bpb": [round(float(v) / max(n_hop, 1) / math.log(2), 4) for v in hop_curve] if hop_curve is not None else [],
         "memory_swap_med": float(sum(mems) / max(len(mems), 1)),
         "memory_dC_bits": float(sum(v for v in dcs if v == v) / max(sum(1 for v in dcs if v == v), 1)),
@@ -269,19 +297,23 @@ def train_local2(machine: MachineV2, data, phase: PhaseConfig, learn: LearnConfi
                 dS = P2.contrast2(r.s_neg, r.sb, beta_eff, r.xbar, m, cfg.N)
                 dA = P2.wedge2(r.s_neg, r.sb, beta_eff, r.xbar, m, cfg.N) if learn.use_A else None
                 dE = P2.delta_readout2(machine, r.s0, Y, V, m, lm)
+                if cfg.tie_readout and machine.frontend is None:  # второй путь: строка чтения служит входом
+                    dE[0] = dE[0] + P2.tie_input_update(machine, b.x[:, t], r.s_neg, r.sb, beta_eff, m)
                 dXi = P2.dam_contrast(machine, r.s_neg, r.sb, beta_eff, m) if machine.Xi else None
                 dc = P2.c_update(machine, r.s_neg, r.sb, state.traces, beta_eff, m) if (cfg.learn_c and state.traces is not None) else None
                 dg = P2.adapt_gain_update(r.s_neg, r.sb, state.adapt, beta_eff, m) if (cfg.learn_adapt and state.adapt is not None) else None
                 dk = P2.flywheel_gain_update(r.s_neg, r.sb, state.err, beta_eff, m) if (cfg.learn_flywheel and state.err is not None) else None
                 dEin = P2.input_embed_update(machine, b.x[:, t], r.s_neg, r.sb, beta_eff, m) if (cfg.learn_E_in and machine.frontend is None) else None
-                upd = {"S": dS, "A": dA, "E": dE, "Xi": dXi if machine.Xi else None, "c": dc, "g": dg, "k": dk, "Ein": dEin}
+                dgd = P2.dam_gain_update(machine, r.s_neg, r.sb, beta_eff, m) if (cfg.learn_dam_gain and machine.Xi) else None
+                upd = {"S": dS, "A": dA, "E": dE, "Xi": dXi if machine.Xi else None, "c": dc, "g": dg, "k": dk,
+                       "Ein": dEin, "gd": dgd}
                 for grp in learn.freeze:
                     upd[grp] = None
                 ag = set(learn.adam_groups) if adam is not None else set()
                 info = {}
                 if adam is not None:
                     a = {k: (v if k in ag else None) for k, v in upd.items()}
-                    info.update(adam.apply(a["S"], a["A"], a["E"], a["Xi"], a["c"], a["g"], a["k"], a["Ein"],
+                    info.update(adam.apply(a["S"], a["A"], a["E"], a["Xi"], a["c"], a["g"], a["k"], a["Ein"], a["gd"],
                                            learn.decay_S, learn.decay_A, learn.decay_E))
                 s_ = {k: (None if k in ag else v) for k, v in upd.items()}
                 lc, lg, lk = (learn.lr_c, learn.lr_g, learn.lr_k) if learn.neuron_steps == "sgd" else (lr_c, lr_g, lr_k)
@@ -289,7 +321,10 @@ def train_local2(machine: MachineV2, data, phase: PhaseConfig, learn: LearnConfi
                                              learn.lr_E, lr_Xi, 0.0 if adam is not None else learn.decay_S,
                                              0.0 if adam is not None else learn.decay_A, 0.0 if adam is not None else learn.decay_E,
                                              learn.max_norm_ratio, s_["c"], s_["g"], lc, lg, s_["k"], lk, s_["Ein"], lr_Ein,
-                                             neuron_steps=learn.neuron_steps))
+                                             s_["gd"], learn.lr_gd,
+                                             neuron_steps=learn.neuron_steps, step_mode=learn.step_mode,
+                                             trust_ratio=learn.trust_ratio, trust_groups=learn.trust_groups,
+                                             trust_max_gain=learn.trust_max_gain))
                 if c_total is not None and upd["c"] is not None:
                     P2.project_c_profile(machine, c_total)
                 info.update(machine.synaptic_scaling())

@@ -1,0 +1,93 @@
+{
+  "recorded_utc": "2026-09-19T23:49:23.344056+00:00",
+  "runs": {
+    "abl_z06": {
+      "last_logged_step": 150,
+      "eval_step": 150,
+      "h1": 4.7732146508763,
+      "mean8": 4.745585843783674,
+      "optimizer": "absent",
+      "muon_flag": false,
+      "gate_min": 0.9998117685317993,
+      "gate_mean": 0.999998927116394,
+      "fraction_below_099": 0.0
+    },
+    "abl_noR": {
+      "last_logged_step": 150,
+      "eval_step": 150,
+      "h1": 4.818590073461262,
+      "mean8": 4.776886722779347,
+      "optimizer": "absent",
+      "muon_flag": false,
+      "gate_min": 0.999862015247345,
+      "gate_mean": 0.9999992847442627,
+      "fraction_below_099": 0.0
+    },
+    "abl_z06noR": {
+      "last_logged_step": 150,
+      "eval_step": 150,
+      "h1": 4.773475950181102,
+      "mean8": 4.745804185877829,
+      "optimizer": "absent",
+      "muon_flag": false,
+      "gate_min": 0.9998159408569336,
+      "gate_mean": 0.999998927116394,
+      "fraction_below_099": 0.0
+    },
+    "gp_on": {
+      "last_logged_step": 137,
+      "eval_step": 125,
+      "h1": 4.85252541635477,
+      "mean8": 4.806452096148476,
+      "optimizer": "absent",
+      "muon_flag": false,
+      "gate_min": 0.9998424053192139,
+      "gate_mean": 0.999998927116394,
+      "fraction_below_099": 0.0
+    },
+    "gp_off": {
+      "last_logged_step": 137,
+      "eval_step": 125,
+      "h1": 4.777305223424815,
+      "mean8": 4.744223295518784,
+      "optimizer": "absent",
+      "muon_flag": false,
+      "gate_min": 0.9998029470443726,
+      "gate_mean": 0.999998927116394,
+      "fraction_below_099": 0.0
+    },
+    "opt_adam": {
+      "last_logged_step": 121,
+      "eval_step": 100,
+      "h1": 6.459752753628024,
+      "mean8": 6.418492053550699,
+      "optimizer": "adam",
+      "muon_flag": false,
+      "gate_min": 0.7979972958564758,
+      "gate_mean": 0.9760622978210449,
+      "fraction_below_099": 0.6357192993164062
+    },
+    "muon_only": {
+      "last_logged_step": 92,
+      "eval_step": 75,
+      "h1": 4.847467606886189,
+      "mean8": 4.8128035843136745,
+      "optimizer": "muon",
+      "muon_flag": false,
+      "gate_min": 0.9998672604560852,
+      "gate_mean": 0.9999992847442627,
+      "fraction_below_099": 0.0
+    },
+    "energy_muon": {
+      "last_logged_step": 92,
+      "eval_step": 75,
+      "h1": 4.960778213756193,
+      "mean8": 4.925594653393015,
+      "optimizer": "muon",
+      "muon_flag": false,
+      "gate_min": 0.9995120763778687,
+      "gate_mean": 0.9999886155128479,
+      "fraction_below_099": 0.0
+    }
+  }
+}

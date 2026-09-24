@@ -1,0 +1,8 @@
+{
+  "drrem/rrem_repaired.py": "3f0c3be3e30d7186f9e385cadb4f7a161b13f61659dd58c9e291d92c384121c1",
+  "drrem/core/predictive_energy.py": "7e67826fce6a24f1c6685c3010666f1c32f1c1e0ed678bb3c2db53ef935718ab",
+  "drrem/data/openorca.py": "f9e39f5dd679d252c01a11e22f1d818c195b708b56381159d27fe30533a37ed4",
+  "drrem/data/protocol.py": "dc25cc0643bc4390402b9408ef254aa0071ce335ee84a82267b388949399ec7b",
+  "drrem/config.py": "6933822faa211e4d1dd0be6b002844006adef70dcda6e96152a2543218d4a008",
+  "tests/test_predictive_energy.py": "7889427dbcdea5108198486cef9ae95bd87edb3f8bf4205d794d7855c6209fb0"
+}

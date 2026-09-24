@@ -1,0 +1,13 @@
+{
+  "context": "zero state, each byte once, initial tied dictionary, train-only unigram bias",
+  "by_level": {
+    "0": {
+      "argmax_is_current_byte_fraction": 0.33984375,
+      "mean_probability_current_byte": 0.19935980439186096
+    },
+    "1": {
+      "argmax_is_current_byte_fraction": 0.00390625,
+      "mean_probability_current_byte": 0.003962111659348011
+    }
+  }
+}

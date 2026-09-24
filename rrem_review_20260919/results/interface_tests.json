@@ -1,0 +1,15 @@
+{
+  "last_hop_loss_gradient_errors": {
+    "S": 2.3208741800609697e-15,
+    "A": 2.15634642734288e-15,
+    "gate": 2.4669707356549717e-15,
+    "E": 2.2136667220700903e-15,
+    "E_bias": 8.691443000357647e-17,
+    "E_in": 0.0,
+    "phi": 4.908012739267284e-15
+  },
+  "generation_readonly_and_seeded": true,
+  "jsonl_cli_selfcheck_stdout": "data selfcheck: 600 horizon/boundary assertions passed",
+  "split_overlap_rejected": true,
+  "cost_inverse_gate_weight_rescaling_relative_error": 0.0
+}

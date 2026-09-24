@@ -1,0 +1,13 @@
+{
+  "recorded_utc": "2026-09-19T23:28:38.984396+00:00",
+  "source": "drrem/rrem_repaired.py",
+  "source_sha256": "75d3a36dcb215e9082a5f3c108a7fb468ef4e24941774545699e2ca11f2e93f3",
+  "readme_sha256": "dc1647b6e185874c9cbe74f96e446a21f3f71f82b6e5284af3f524026f0a7cc8",
+  "references": {
+    "/tmp/claude-1000/-home-echoens/652a372e-fab8-4cb7-ba9d-eb5caff6dba8/scratchpad/tbptt.py": "27a11e939c099aa8bfff2d1e0db5fa8b21dd81628c110d75cccdcecaac47b3e6",
+    "/tmp/claude-1000/-home-echoens/652a372e-fab8-4cb7-ba9d-eb5caff6dba8/scratchpad/test_eval.py": "e8a4180f9f70f924d262bb3f4a2e3926a5aa52fc01b798b84572c5ba7bc62efe",
+    "/tmp/claude-1000/-home-echoens/652a372e-fab8-4cb7-ba9d-eb5caff6dba8/scratchpad/rep/last_clean.pt": "6726fc23f97b490750a02e39b30eb07dd2ede644d2ffa3a83fa089fc1c60b0de",
+    "/tmp/claude-1000/-home-echoens/652a372e-fab8-4cb7-ba9d-eb5caff6dba8/scratchpad/rep/fixed_all.pt": "603a39cb50f58d394ce60ab8df06e75637dbf93dd3fcc7b5d622b7185b5b6207",
+    "/tmp/claude-1000/-home-echoens/652a372e-fab8-4cb7-ba9d-eb5caff6dba8/scratchpad/rep/lvlE_ro.pt": "a6678d7d38a063e7a84953e7b9196ee18dce1be1acbd156a3a0b7552005da994"
+  }
+}

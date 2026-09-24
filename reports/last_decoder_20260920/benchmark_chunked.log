@@ -1,0 +1,4 @@
+{"B": 16, "step": 0, "seconds": 5.009340282063931, "bytes": 840, "peak_bytes": 2821721600}
+{"B": 16, "step": 1, "seconds": 4.590572665911168, "bytes": 997, "peak_bytes": 2838515200}
+{"B": 64, "step": 0, "seconds": 7.515597945079207, "bytes": 3857, "peak_bytes": 2872425984}
+{"B": 64, "step": 1, "seconds": 7.341382575687021, "bytes": 3683, "peak_bytes": 2888171008}

@@ -1,0 +1,11 @@
+data selfcheck: 288 horizon/boundary assertions passed
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/echoens/Coding/Python/DRREM/drrem/rrem_repaired.py", line 1033, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/home/echoens/Coding/Python/DRREM/drrem/rrem_repaired.py", line 985, in main
+    if ck.get('data_protocol')!=protocol:raise ValueError('resume data protocol differs (source, split, truncation, batch, or sampler)')
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: resume data protocol differs (source, split, truncation, batch, or sampler)

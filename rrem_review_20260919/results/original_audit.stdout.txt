@@ -1,0 +1,182 @@
+{
+  "evaluation_mutation": {
+    "theta_l2_after_one_eval": 0.059645701199769974,
+    "bpb_first": 8.082378387451172,
+    "bpb_second": 8.081735610961914
+  },
+  "uniform_bpb": [
+    [
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0
+    ],
+    [
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0
+    ]
+  ],
+  "muon_amplitude": [
+    {
+      "signal_scale": 1.0,
+      "step_norm": 0.03092160985846537,
+      "confidence": 0.9774472032524015
+    },
+    {
+      "signal_scale": 0.001,
+      "step_norm": 0.030921609843072895,
+      "confidence": 0.9774472027673402
+    },
+    {
+      "signal_scale": 1e-06,
+      "step_norm": 0.030921594450595554,
+      "confidence": 0.9774467177062693
+    }
+  ],
+  "ns_parity": {
+    "sym_error": 1.2212453270876722e-15,
+    "skew_error": 1.5543122344752192e-15,
+    "singular_min": 0.7395311738795319,
+    "singular_max": 1.1338258107126815
+  },
+  "gated_structure": {
+    "Sg_sym_error": 0.029996968805789948,
+    "Ag_skew_error": 0.027994513511657715
+  },
+  "phase_sign": {
+    "cosine_code_true": -1.0,
+    "correct": [
+      -0.4890154573620741,
+      -0.27015115293406977,
+      0.4005718077734669
+    ],
+    "code": [
+      0.4890154573620741,
+      0.27015115293406977,
+      -0.4005718077734669
+    ]
+  },
+  "ff_default": {
+    "positive_goodness": [
+      [
+        0.04441838711500168,
+        0.0915306955575943
+      ],
+      [
+        0.019986094906926155,
+        0.07500041276216507
+      ],
+      [
+        0.010503232479095459,
+        0.10747750848531723
+      ]
+    ],
+    "modulator": [
+      [
+        0.41939061880111694,
+        0.4370502829551697
+      ],
+      [
+        0.45267024636268616,
+        0.41259530186653137
+      ],
+      [
+        0.44909635186195374,
+        0.41697680950164795
+      ]
+    ],
+    "analytic_bound": "goodness <= route_budget**2 == ff_theta; modulator >= 0"
+  },
+  "zero_weights_gate_update": {
+    "proposed_gate_signal_norm": 1.8689664602279663,
+    "exact_gate_gradient_norm": 0.0
+  },
+  "closed_gate_weight_update": {
+    "proposed_S_signal_norm": 1.3351719379425049,
+    "exact_S_gradient_norm": 0.0
+  },
+  "invalid_ff": {
+    "S_signal_norm_with_zero_valid_targets": 0.4162791967391968
+  },
+  "reward_ignores_h2_h8": {
+    "first_R": -0.01038376521319151,
+    "changed_future_R": -0.01038376521319151
+  },
+  "one_hop_alignment": [
+    {
+      "signed_post_gate": true,
+      "seed": 3,
+      "S_cosine": 0.44780734181404114,
+      "A_cosine": 0.4428257644176483
+    },
+    {
+      "signed_post_gate": true,
+      "seed": 7,
+      "S_cosine": 0.22569909691810608,
+      "A_cosine": 0.17799721658229828
+    },
+    {
+      "signed_post_gate": true,
+      "seed": 17,
+      "S_cosine": 0.096737340092659,
+      "A_cosine": 0.037461843341588974
+    },
+    {
+      "signed_post_gate": false,
+      "seed": 3,
+      "S_cosine": 0.9561420679092407,
+      "A_cosine": 0.9554364681243896
+    },
+    {
+      "signed_post_gate": false,
+      "seed": 7,
+      "S_cosine": 0.9517138600349426,
+      "A_cosine": 0.9463173151016235
+    },
+    {
+      "signed_post_gate": false,
+      "seed": 17,
+      "S_cosine": 0.9447173476219177,
+      "A_cosine": 0.9471675753593445
+    }
+  ],
+  "tie_flag_noop_max_difference": 0.0,
+  "signed_homeostasis": [
+    {
+      "theta": 0.0,
+      "abs_message": 0.0
+    },
+    {
+      "theta": 0.2,
+      "abs_message": 0.1973753273487091
+    },
+    {
+      "theta": 1.0,
+      "abs_message": 0.7615941762924194
+    },
+    {
+      "theta": 3.0,
+      "abs_message": 0.9950547814369202
+    }
+  ],
+  "batch_ema_first_to_last_ratio_64": 0.03949909390643792,
+  "gate_price_reparameterization": {
+    "effective_W_relative_change": 5.174515393946422e-08,
+    "counted_edge_fraction_before": 1.0,
+    "counted_edge_fraction_after": 0.0
+  },
+  "readonly_adapter": {
+    "repeat_identical": true,
+    "theta_and_activity_unchanged": true
+  }
+}

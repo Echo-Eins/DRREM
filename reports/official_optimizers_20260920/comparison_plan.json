@@ -1,0 +1,89 @@
+{
+  "steps": 120,
+  "batch": 16,
+  "N": 256,
+  "L": 2,
+  "hops": 8,
+  "horizons": 8,
+  "response_max": 64,
+  "dev_docs": 64,
+  "test_docs": 256,
+  "seed": 20260922,
+  "trials": [
+    [
+      "pilot_local_adam",
+      "local",
+      "level",
+      "adam",
+      ".0001",
+      true,
+      false
+    ],
+    [
+      "pilot_local_muon",
+      "local",
+      "level",
+      "muon",
+      ".0005",
+      true,
+      false
+    ],
+    [
+      "pilot_global_adam",
+      "global",
+      "global",
+      "adam",
+      ".0001",
+      true,
+      false
+    ],
+    [
+      "pilot_global_muon",
+      "global",
+      "global",
+      "muon",
+      ".0005",
+      true,
+      false
+    ],
+    [
+      "pilot_contrast_adam",
+      "contrast",
+      "level",
+      "adam",
+      ".0001",
+      true,
+      false
+    ],
+    [
+      "local_muon_whole",
+      "local",
+      "global",
+      "muon",
+      ".0005",
+      false,
+      false
+    ],
+    [
+      "local_frozen",
+      "local",
+      "level",
+      "adam",
+      ".0001",
+      false,
+      true
+    ],
+    [
+      "global_frozen",
+      "global",
+      "global",
+      "adam",
+      ".0001",
+      false,
+      true
+    ]
+  ],
+  "selection": "All listed endpoints will be reported; no test consulted during training. Muon initial S/A update RMS was 0.83 times Adam at chosen rates.",
+  "primary_metric": "last-level next-byte bits; also all eight horizons and both levels",
+  "limits": "Single seed, short training, historically reused corpus. Global means a full current-byte graph with detached history."
+}

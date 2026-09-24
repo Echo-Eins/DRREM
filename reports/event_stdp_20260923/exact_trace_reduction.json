@@ -1,0 +1,13 @@
+{
+  "two_trace_source": "aeb9df982f95d5e79c83fa7a7b5dbbdded62998dd1f011bb05cd08b25da381f1",
+  "current_source": "45744d3f510f58081418d065ff7fe518e68394e3b14d590bd0b28ba180f1dfe3",
+  "max_parameter_error_after_adam": {
+    "S": 6.938893903907228e-18,
+    "A": 6.938893903907228e-18,
+    "E": 2.7755575615628914e-17,
+    "E_bias": 0.0,
+    "E_in": 0.0
+  },
+  "dtype": "float64",
+  "input_tied": true
+}

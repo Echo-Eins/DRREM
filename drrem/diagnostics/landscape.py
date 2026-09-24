@@ -50,6 +50,10 @@ def load_machine(ckpt: str | Path, device: str) -> MachineV2:
         m.c = sd["c"]
     if sd.get("g_adapt") is not None:
         m.g_adapt = sd["g_adapt"]
+    if sd.get("kappa") is not None:  # иначе усиление маховика у обученной машины молча возвращалось к умолчанию
+        m.kappa = sd["kappa"]
+    if sd.get("dam_g") is not None:  # то же для усиления плотной памяти — при learn_dam_gain это потеря параметра
+        m.dam_g = torch.as_tensor(sd["dam_g"], device=device)
     thr = sd.get("tick_thr")
     if thr is not None:
         thr = torch.as_tensor(thr, device=device).flatten()
@@ -65,17 +69,20 @@ def load_machine(ckpt: str | Path, device: str) -> MachineV2:
 @torch.no_grad()
 def energy_from_s(m: MachineV2, s: torch.Tensor, I: torch.Tensor, xbar, bias) -> torch.Tensor:
     """Та же формула, что MachineV2.energy, но от событий s (без ограничения кубом)."""
+    if m.cfg.rho == "gate":
+        raise NotImplementedError("срез ландшафта параметризован событием s; у вентиля энергия зависит от x "
+                                  "(восстанавливающий член ½‖x‖²), поэтому такой срез для него не определён")
     W = m.W()
     E = -0.5 * ((s @ W.T) * s).sum(-1) - (s * I).sum(-1) + (0.5 * s * s + m.theta * s).sum(-1)
     if xbar is not None:
-        E = E - (s * (xbar @ W.T)).sum(-1)
+        E = E - (s * m.recurrent_drive(torch.zeros_like(s), xbar, W)).sum(-1)  # профиль на целевой уровень
     if bias is not None:
         E = E - (s * bias).sum(-1)
     if m.Xi:
         B, N, L = s.shape[0], m.cfg.N, m.cfg.L
         s_l = s.view(B, L, N)
         for l in range(L):
-            E = E - (m.cfg.dam_gain / m.cfg.dam_beta) * torch.logsumexp(m.cfg.dam_beta * (s_l[:, l] @ m.Xi[l].T), dim=-1)
+            E = E - (m.dam_g[l] / m.cfg.dam_beta) * torch.logsumexp(m.cfg.dam_beta * (s_l[:, l] @ m.Xi[l].T), dim=-1)
     return E
 
 

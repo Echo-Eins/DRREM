@@ -1,0 +1,440 @@
+{
+  "trials": {
+    "pilot_local_adam": {
+      "label": "Local gradient / level Adam",
+      "dev_h1": 4.4179557660318505,
+      "test_h1": 4.359927872831462,
+      "test_mean_h": 4.46152960156678,
+      "test_h1_by_level": [
+        4.375537711042965,
+        4.359927872831462
+      ],
+      "seconds_per_batch_median": 0.8957393788732588,
+      "update_ms_median": 6.257618311792612,
+      "response_bytes_per_second_median": 1010.9092604447371,
+      "peak_allocated_MiB": 209.97802734375,
+      "optimizer_state_MiB": 42.03141784667969,
+      "total_training_seconds": 110.22377263987437,
+      "total_response_bytes": 111063
+    },
+    "pilot_local_muon": {
+      "label": "Local gradient / level Muon",
+      "dev_h1": 4.363532002151087,
+      "test_h1": 4.300267656816943,
+      "test_mean_h": 4.405821093583965,
+      "test_h1_by_level": [
+        4.327038397063236,
+        4.300267656816943
+      ],
+      "seconds_per_batch_median": 0.9463408440351486,
+      "update_ms_median": 11.095194146037102,
+      "response_bytes_per_second_median": 985.8416363074439,
+      "peak_allocated_MiB": 191.97802734375,
+      "optimizer_state_MiB": 24.031280517578125,
+      "total_training_seconds": 112.30564810382202,
+      "total_response_bytes": 111063
+    },
+    "local_muon_whole": {
+      "label": "Local gradient / whole Muon",
+      "dev_h1": 4.3525394447858385,
+      "test_h1": 4.323473220563907,
+      "test_mean_h": 4.408705367452708,
+      "test_h1_by_level": [
+        4.352271523142905,
+        4.323473220563907
+      ],
+      "seconds_per_batch_median": 0.9657646673731506,
+      "update_ms_median": 6.893153768032789,
+      "response_bytes_per_second_median": 946.5310234499372,
+      "peak_allocated_MiB": 191.97802734375,
+      "optimizer_state_MiB": 24.031269073486328,
+      "total_training_seconds": 116.13938901666552,
+      "total_response_bytes": 111063
+    },
+    "pilot_global_adam": {
+      "label": "Full tick gradient / Adam",
+      "dev_h1": 4.243512137251753,
+      "test_h1": 4.179153619316543,
+      "test_mean_h": 4.414788198965586,
+      "test_h1_by_level": [
+        4.33519118100473,
+        4.179153619316543
+      ],
+      "seconds_per_batch_median": 1.2905533998273313,
+      "update_ms_median": 5.140719003975391,
+      "response_bytes_per_second_median": 723.8173013657985,
+      "peak_allocated_MiB": 210.54052734375,
+      "optimizer_state_MiB": 42.03133773803711,
+      "total_training_seconds": 155.1526719117537,
+      "total_response_bytes": 111063
+    },
+    "pilot_global_muon": {
+      "label": "Full tick gradient / Muon",
+      "dev_h1": 4.285357713178331,
+      "test_h1": 4.243390206207363,
+      "test_mean_h": 4.380183193848405,
+      "test_h1_by_level": [
+        4.364781220482041,
+        4.243390206207363
+      ],
+      "seconds_per_batch_median": 1.2966657909564674,
+      "update_ms_median": 8.239461109042168,
+      "response_bytes_per_second_median": 706.997601847745,
+      "peak_allocated_MiB": 192.54052734375,
+      "optimizer_state_MiB": 24.031269073486328,
+      "total_training_seconds": 157.40769839519635,
+      "total_response_bytes": 111063
+    },
+    "pilot_contrast_adam": {
+      "label": "Finite contrast / official Adam",
+      "dev_h1": 4.250693551572006,
+      "test_h1": 4.1898257598281585,
+      "test_mean_h": 4.421355358285989,
+      "test_h1_by_level": [
+        4.325911213646444,
+        4.1898257598281585
+      ],
+      "seconds_per_batch_median": 0.8951975791715086,
+      "update_ms_median": 6.218379829078913,
+      "response_bytes_per_second_median": 1035.2493311793235,
+      "peak_allocated_MiB": 201.84765625,
+      "optimizer_state_MiB": 42.03141784667969,
+      "total_training_seconds": 108.24136759713292,
+      "total_response_bytes": 111063
+    },
+    "local_frozen": {
+      "label": "Frozen core / local head objective",
+      "dev_h1": 4.7634942400163025,
+      "test_h1": 4.624188210143771,
+      "test_mean_h": 4.555333764831571,
+      "test_h1_by_level": [
+        4.404405880408675,
+        4.624188210143771
+      ],
+      "seconds_per_batch_median": 0.8906487920321524,
+      "update_ms_median": 0.48468494787812233,
+      "response_bytes_per_second_median": 1061.1384356542442,
+      "peak_allocated_MiB": 116.203125,
+      "optimizer_state_MiB": 4.015632629394531,
+      "total_training_seconds": 104.39835540577769,
+      "total_response_bytes": 111063
+    },
+    "global_frozen": {
+      "label": "Frozen core / full tick head objective",
+      "dev_h1": 4.744639652659533,
+      "test_h1": 4.605812332970283,
+      "test_mean_h": 4.538904690070167,
+      "test_h1_by_level": [
+        4.42032456205201,
+        4.605812332970283
+      ],
+      "seconds_per_batch_median": 0.8991366727277637,
+      "update_ms_median": 0.4923650994896889,
+      "response_bytes_per_second_median": 1030.4253843665433,
+      "peak_allocated_MiB": 110.33544921875,
+      "optimizer_state_MiB": 4.015632629394531,
+      "total_training_seconds": 108.3071318846196,
+      "total_response_bytes": 111063
+    }
+  },
+  "paired_test_comparisons": {
+    "local_frozen -> pilot_local_adam": {
+      "h1_gain_by_level": [
+        0.028868169365708865,
+        0.26426033731230847
+      ],
+      "h1_gain_95pct_by_level": [
+        [
+          0.024883520168923225,
+          0.032914168126800335
+        ],
+        [
+          0.24852957915103507,
+          0.2812798441755005
+        ]
+      ],
+      "all_h_gain_by_level": [
+        0.019806922818635903,
+        0.09380416326479019
+      ],
+      "all_h_gain_95pct_by_level": [
+        [
+          0.01482897870462057,
+          0.024904174211941653
+        ],
+        [
+          0.08293847037448182,
+          0.10545865018697927
+        ]
+      ],
+      "n_documents": 256,
+      "bootstrap_samples": 4000,
+      "positive_means_candidate_better": true
+    },
+    "local_frozen -> pilot_local_muon": {
+      "h1_gain_by_level": [
+        0.07736748334543993,
+        0.32392055332682756
+      ],
+      "h1_gain_95pct_by_level": [
+        [
+          0.06924917686744564,
+          0.08629370917863287
+        ],
+        [
+          0.30061683899584857,
+          0.3499310366391258
+        ]
+      ],
+      "all_h_gain_by_level": [
+        0.064519030982877,
+        0.14951267124760528
+      ],
+      "all_h_gain_95pct_by_level": [
+        [
+          0.050901211993643634,
+          0.07959093640521873
+        ],
+        [
+          0.12738589780676896,
+          0.1746529771210698
+        ]
+      ],
+      "n_documents": 256,
+      "bootstrap_samples": 4000,
+      "positive_means_candidate_better": true
+    },
+    "global_frozen -> pilot_global_adam": {
+      "h1_gain_by_level": [
+        0.08513338104727998,
+        0.42665871365373925
+      ],
+      "h1_gain_95pct_by_level": [
+        [
+          0.07709200637316005,
+          0.09346871524179529
+        ],
+        [
+          0.4066715707935623,
+          0.44739863623749043
+        ]
+      ],
+      "all_h_gain_by_level": [
+        0.04025176503358826,
+        0.12411649110458164
+      ],
+      "all_h_gain_95pct_by_level": [
+        [
+          0.03345129857403757,
+          0.047328061374637756
+        ],
+        [
+          0.11076964702047518,
+          0.13865833599056782
+        ]
+      ],
+      "n_documents": 256,
+      "bootstrap_samples": 4000,
+      "positive_means_candidate_better": true
+    },
+    "global_frozen -> pilot_global_muon": {
+      "h1_gain_by_level": [
+        0.055543341569968895,
+        0.36242212676292046
+      ],
+      "h1_gain_95pct_by_level": [
+        [
+          0.048112388330253664,
+          0.06347081924173341
+        ],
+        [
+          0.33923473062315423,
+          0.38772145943089603
+        ]
+      ],
+      "all_h_gain_by_level": [
+        0.06840180917598356,
+        0.15872149622176276
+      ],
+      "all_h_gain_95pct_by_level": [
+        [
+          0.05549110027601975,
+          0.08241470400972717
+        ],
+        [
+          0.1364086017572426,
+          0.18316070247007726
+        ]
+      ],
+      "n_documents": 256,
+      "bootstrap_samples": 4000,
+      "positive_means_candidate_better": true
+    },
+    "pilot_local_adam -> pilot_local_muon": {
+      "h1_gain_by_level": [
+        0.04849931397973107,
+        0.05966021601451909
+      ],
+      "h1_gain_95pct_by_level": [
+        [
+          0.04203218729515684,
+          0.05568041679422186
+        ],
+        [
+          0.050430111699805207,
+          0.0705260625897282
+        ]
+      ],
+      "all_h_gain_by_level": [
+        0.04471210816424108,
+        0.055708507982815104
+      ],
+      "all_h_gain_95pct_by_level": [
+        [
+          0.034672421264478656,
+          0.055947775281082406
+        ],
+        [
+          0.04297272154791306,
+          0.07008436396974616
+        ]
+      ],
+      "n_documents": 256,
+      "bootstrap_samples": 4000,
+      "positive_means_candidate_better": true
+    },
+    "pilot_global_adam -> pilot_global_muon": {
+      "h1_gain_by_level": [
+        -0.029590039477311085,
+        -0.06423658689081886
+      ],
+      "h1_gain_95pct_by_level": [
+        [
+          -0.0348505970947987,
+          -0.024031214540514826
+        ],
+        [
+          -0.07255023113464529,
+          -0.054718830195030294
+        ]
+      ],
+      "all_h_gain_by_level": [
+        0.028150044142395303,
+        0.034605005117181106
+      ],
+      "all_h_gain_95pct_by_level": [
+        [
+          0.021187347179892662,
+          0.03599148633536662
+        ],
+        [
+          0.02523830758986961,
+          0.04544981253808514
+        ]
+      ],
+      "n_documents": 256,
+      "bootstrap_samples": 4000,
+      "positive_means_candidate_better": true
+    },
+    "pilot_local_muon -> local_muon_whole": {
+      "h1_gain_by_level": [
+        -0.025233126079669863,
+        -0.02320556374696393
+      ],
+      "h1_gain_95pct_by_level": [
+        [
+          -0.027967077075852935,
+          -0.02265843505220078
+        ],
+        [
+          -0.026969139866124994,
+          -0.01937551819966966
+        ]
+      ],
+      "all_h_gain_by_level": [
+        -0.007293778213469464,
+        -0.0028842738687427593
+      ],
+      "all_h_gain_95pct_by_level": [
+        [
+          -0.010921503170694182,
+          -0.00391079340487877
+        ],
+        [
+          -0.006559895610308031,
+          0.0007993826961613646
+        ]
+      ],
+      "n_documents": 256,
+      "bootstrap_samples": 4000,
+      "positive_means_candidate_better": true
+    },
+    "pilot_local_adam -> pilot_global_adam": {
+      "h1_gain_by_level": [
+        0.040346530038235254,
+        0.1807742535149185
+      ],
+      "h1_gain_95pct_by_level": [
+        [
+          0.03388087036888414,
+          0.047069057391937896
+        ],
+        [
+          0.17260866535288086,
+          0.18915458243022656
+        ]
+      ],
+      "all_h_gain_by_level": [
+        0.01605318951507482,
+        0.04674140260119457
+      ],
+      "all_h_gain_95pct_by_level": [
+        [
+          0.012198054061232904,
+          0.019967614796975595
+        ],
+        [
+          0.042092571287888514,
+          0.05148773982409855
+        ]
+      ],
+      "n_documents": 256,
+      "bootstrap_samples": 4000,
+      "positive_means_candidate_better": true
+    },
+    "pilot_contrast_adam -> pilot_global_adam": {
+      "h1_gain_by_level": [
+        -0.009279967358286074,
+        0.010672140511615207
+      ],
+      "h1_gain_95pct_by_level": [
+        [
+          -0.010871544167123734,
+          -0.00770545940810867
+        ],
+        [
+          0.008634309674336876,
+          0.012730635555282793
+        ]
+      ],
+      "all_h_gain_by_level": [
+        0.001672440684261119,
+        0.006567159320401991
+      ],
+      "all_h_gain_95pct_by_level": [
+        [
+          0.0007304656284596353,
+          0.002609317573445758
+        ],
+        [
+          0.005303236457431736,
+          0.00783728474113005
+        ]
+      ],
+      "n_documents": 256,
+      "bootstrap_samples": 4000,
+      "positive_means_candidate_better": true
+    }
+  },
+  "caveat": "Document bootstrap conditional on one initialization; not seed-to-seed uncertainty."
+}

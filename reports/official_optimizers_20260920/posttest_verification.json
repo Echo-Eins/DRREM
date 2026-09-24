@@ -1,0 +1,66 @@
+{
+  "pilot_local_adam": {
+    "test_opened_once": true,
+    "steps": 120,
+    "source_hashes_match": true,
+    "test_choice_hash_matches": true
+  },
+  "pilot_local_muon": {
+    "test_opened_once": true,
+    "steps": 120,
+    "source_hashes_match": true,
+    "test_choice_hash_matches": true
+  },
+  "pilot_global_adam": {
+    "test_opened_once": true,
+    "steps": 120,
+    "source_hashes_match": true,
+    "test_choice_hash_matches": true
+  },
+  "pilot_global_muon": {
+    "test_opened_once": true,
+    "steps": 120,
+    "source_hashes_match": true,
+    "test_choice_hash_matches": true
+  },
+  "pilot_contrast_adam": {
+    "test_opened_once": true,
+    "steps": 120,
+    "source_hashes_match": true,
+    "test_choice_hash_matches": true
+  },
+  "local_muon_whole": {
+    "test_opened_once": true,
+    "steps": 120,
+    "source_hashes_match": true,
+    "test_choice_hash_matches": true
+  },
+  "local_frozen": {
+    "test_opened_once": true,
+    "steps": 120,
+    "source_hashes_match": true,
+    "test_choice_hash_matches": true,
+    "frozen_groups_bitwise_unchanged": [
+      "S",
+      "A",
+      "gate",
+      "route_logits",
+      "route_slope",
+      "theta"
+    ]
+  },
+  "global_frozen": {
+    "test_opened_once": true,
+    "steps": 120,
+    "source_hashes_match": true,
+    "test_choice_hash_matches": true,
+    "frozen_groups_bitwise_unchanged": [
+      "S",
+      "A",
+      "gate",
+      "route_logits",
+      "route_slope",
+      "theta"
+    ]
+  }
+}

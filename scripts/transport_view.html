@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DRREM — реальный граф вычисления · 3D</title>
+<style>
+:root{color-scheme:dark;--bg:#090f19;--panel:#101a29;--line:#24344a;--text:#e4edf8;--muted:#92a6bf;--cyan:#51dccf;--amber:#ffb56a;--violet:#b899ff;--blue:#7baeff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 system-ui,-apple-system,sans-serif}button,input,select{font:inherit}button,select,input[type=number]{background:#162338;border:1px solid #30445f;border-radius:7px;color:var(--text);padding:6px 9px}button{cursor:pointer}button:hover,button:focus-visible{border-color:var(--cyan);background:#203448}button.active{color:#071b22;background:var(--cyan);border-color:var(--cyan)}select{width:100%;text-overflow:ellipsis}input[type=range]{width:100%;accent-color:var(--cyan)}input[type=checkbox]{accent-color:var(--cyan)}a{color:var(--cyan)}h1,h2,h3,p{margin:0}h1{font-size:19px;font-weight:650;letter-spacing:.02em}h2{font-size:13px;font-weight:600}h3{font-size:12px;color:var(--muted);font-weight:600;margin:12px 0 5px}small,.muted{color:var(--muted)}code{font:11px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace}header{padding:14px 22px 12px;display:flex;align-items:center;gap:22px;border-bottom:1px solid var(--line);background:#0c1522}.brand{font-size:10px;font-weight:700;color:var(--cyan);letter-spacing:.2em;margin-bottom:3px}.header-right{margin-left:auto;text-align:right}.badge{display:inline-block;padding:3px 8px;border:1px solid #37525a;border-radius:5px;color:#9de2d9;font-size:11px}.honesty{background:#211d28;border-bottom:1px solid #46374f;color:#dfcbe9;font-size:12px;padding:8px 22px}.layout{display:grid;grid-template-columns:248px minmax(450px,1fr) 320px;min-height:760px;height:calc(100vh - 116px)}aside{background:var(--panel);padding:16px;overflow:auto;scrollbar-width:thin}.left{border-right:1px solid var(--line)}.right{border-left:1px solid var(--line)}.section{border-top:1px solid var(--line);margin-top:15px;padding-top:13px}.control{display:block;margin:8px 0}.row{display:flex;gap:8px;align-items:center}.spread{justify-content:space-between}.tiny{font-size:11px}.note{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.6}.two{display:grid;grid-template-columns:1fr 1fr;gap:7px}.preset{width:100%;text-align:left;font-size:11px;margin-top:6px}.scene{position:relative;min-width:0;overflow:hidden;background:radial-gradient(ellipse at 47% 43%,#14283a 0%,#0c1724 49%,#090f19 83%)}#graph{display:block;width:100%;height:calc(100% - 122px);touch-action:none;cursor:grab}#graph:active{cursor:grabbing}.scene-top{position:absolute;top:13px;left:18px;right:18px;display:flex;justify-content:space-between;pointer-events:none;gap:10px}.scene-top strong{font-size:15px}.scene-top small{display:block;font-size:11px}.top-buttons{pointer-events:auto;display:flex;gap:6px;align-items:start}.top-buttons button{font-size:11px;background:#142131db}.legend{position:absolute;left:18px;bottom:142px;font-size:10px;pointer-events:none;line-height:1.9;background:#09111ac9;padding:6px 9px;border:1px solid #24384a;border-radius:6px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px}.timeline{position:absolute;bottom:0;left:0;right:0;height:122px;background:#0d1725ed;border-top:1px solid var(--line);padding:12px 20px}.hop-row{display:flex;align-items:center;gap:13px}.hop-row input{flex:1}.tickrow{display:flex;justify-content:space-between;font:10px ui-monospace,monospace;color:var(--muted);margin:0 71px 0 73px}.stats{display:flex;gap:18px;color:var(--muted);font-size:11px;margin-top:10px;flex-wrap:wrap}.stats b{color:var(--text);font-weight:500}.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);padding-bottom:11px;margin-bottom:13px}.tabs button{font-size:11px;padding:5px 7px;flex:1}.tab{display:none}.tab.active{display:block}.number{font:12px ui-monospace,monospace;font-variant-numeric:tabular-nums}.positive{color:var(--cyan)}.negative{color:var(--amber)}.value-table{width:100%;border-collapse:collapse;margin-top:7px;font-size:11px}.value-table td{padding:5px 0;border-bottom:1px solid #223047}.value-table td:last-child{text-align:right}.value-table tr.total td{border-top:1px solid #69849d;color:#fff;font-weight:600}.equation{font:11px/1.8 ui-monospace,monospace;padding:10px;background:#0b1422;border:1px solid var(--line);border-radius:6px;white-space:pre-wrap;overflow-wrap:anywhere}.token-strip{display:flex;flex-wrap:wrap;gap:3px;margin:8px 0}.token{font:11px ui-monospace,monospace;min-width:19px;padding:3px 4px;border-radius:4px}.token.selected{background:var(--cyan);color:#092129}.token.future{opacity:.45}.barline{display:grid;grid-template-columns:51px 1fr 40px;align-items:center;gap:6px;font-size:10px;margin:5px 0}.track{height:8px;background:#203147;border-radius:3px;overflow:hidden}.fill{height:100%;background:var(--cyan)}details{border:1px solid var(--line);border-radius:6px;padding:7px 9px;margin:8px 0}summary{cursor:pointer;font-size:11px;color:#c2d2e6}details p{font-size:11px;color:var(--muted);margin-top:7px}.edge-button{display:flex;width:100%;justify-content:space-between;margin-top:4px;font-size:10px;padding:4px 6px}.edge-button.chosen{border-color:var(--violet)}pre{font:10px/1.6 ui-monospace,monospace;overflow:auto;max-height:400px;background:#080f19;padding:10px;border-radius:5px;tab-size:4}.proof{color:#98d9b7;font-size:11px;padding:9px;background:#102825;border:1px solid #295446;border-radius:6px;margin:10px 0}.error{color:#ffb3a0;padding:12px}.tooltip{position:absolute;pointer-events:none;background:#09111fec;border:1px solid #6b889c;border-radius:6px;font-size:11px;padding:6px 10px;display:none;z-index:5}.source-title{overflow-wrap:anywhere;font-size:10px}#modelNote{min-height:67px}#coordinate{width:70px}.input-tag{font:12px ui-monospace,monospace;color:#cae2e9;background:#091322;padding:6px 8px;border-radius:5px;overflow-wrap:anywhere}.output-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.horizon{background:#0a1422;border:1px solid #273b53;border-radius:5px;padding:7px}.horizon b{font-size:11px;color:var(--cyan)}.horizon span{display:block;font:10px ui-monospace,monospace;line-height:1.8}.state-label{font-size:11px;color:var(--muted);margin:9px 0}.flow-step{border-left:2px solid #3f7892;margin:0 0 8px 2px;padding:0 0 0 9px;font-size:11px}.flow-step b{display:block}.status-lamp{width:6px;height:6px;background:var(--cyan);border-radius:100%;display:inline-block;margin-right:6px}
+@media(min-width:1750px){.layout{grid-template-columns:266px minmax(450px,1fr) 350px}}
+@media(max-width:1150px){.layout{grid-template-columns:224px minmax(430px,1fr);height:auto}.scene{height:780px}.right{grid-column:1/-1;border-top:1px solid var(--line);height:auto;max-height:600px}.tabs{max-width:450px}.header-right{max-width:230px}.tab.active{max-width:860px}}
+@media(max-width:700px){header{padding:12px;gap:8px}h1{font-size:15px}.header-right{display:none}.honesty{padding:8px 12px}.layout{display:flex;flex-direction:column}.left{order:2}.right{order:3}.scene{height:690px;order:1}.scene-top{left:10px;right:10px}.scene-top strong{font-size:12px}.scene-top small{font-size:9px}.top-buttons{flex-direction:column}.stats{gap:8px}.left{display:grid;grid-template-columns:1fr 1fr;gap:14px}.left .section{margin:0}.legend{font-size:9px}}
+</style>
+</head>
+<body>
+<header><div><div class="brand">DRREM / CODE → TRACE → 3D</div><h1>Геометрия реального вычисления</h1></div><div class="header-right"><span class="badge">Настоящий forward · CPU / FP32</span><div class="tiny muted" id="headerDimensions"></div></div></header>
+<div class="honesty"><b>Демонстрационные веса, без обучения.</b> Здесь исполняется модель шириной <span class="dimN">128</span>, а не сжатый checkpoint 1024. Кольца — только раскладка координат; расстояния не входят в вычисление.</div>
+<main class="layout">
+<aside class="left">
+  <div><h2>Вариант кода</h2><label class="control"><select id="variant" aria-label="Вариант модели"></select></label><p class="note" id="modelNote"></p><p class="tiny"><span class="badge" id="modelClass"></span></p></div>
+  <div class="section"><h2>Байт и его префикс</h2><p class="input-tag" id="prefix"></p><div id="tokens" class="token-strip"></div><p class="note" id="positionLabel"></p></div>
+  <div class="section"><h2>Какие связи показывать</h2><label class="control"><select id="scope" aria-label="Объём отображаемых связей"><option value="star">Связи выбранного нейрона</option><option value="strong">512 наибольших токов</option><option value="all">Все существующие связи</option></select></label><label class="control"><select id="direction" aria-label="Направление связей"><option value="both">Входящие + исходящие</option><option value="in">Входящие</option><option value="out">Исходящие</option></select></label>
+    <label class="control tiny"><input type="checkbox" id="intra" checked> Внутри каждого слоя · плотные</label>
+    <label class="control tiny"><input type="checkbox" id="adjacent" checked> Между соседями · в обе стороны</label>
+    <label class="control tiny"><input type="checkbox" id="bridges" checked> 1[i] ↔ 3[i] · перемычки</label>
+    <label class="control tiny"><input type="checkbox" id="residual" checked> Residual · тот же нейрон, новый хоп</label>
+    <label class="control tiny"><input type="checkbox" id="modules" checked> Вход, внимание, MLP, декодер</label>
+    <label class="control tiny"><input type="checkbox" id="zeros"> Также связи с нулевым током</label>
+    <select id="colorMode" aria-label="Цвет связей"><option value="current">Цвет связи = знак тока</option><option value="family">Цвет связи = её тип</option></select>
+    <label class="control"><select id="scaleMode" aria-label="Масштаб яркости"><option value="shared">Общая шкала всех вариантов</option><option value="auto">Авто · яркость не сравнивать</option></select></label>
+    <p class="note">Яркость не измеряет число активных маршрутов. В этой ветке нет событий спайков; отображаются непрерывные координаты.</p>
+    <p class="note">Фильтры скрывают линии, <b>не отключают вычисление</b>. Большой ток не доказывает важность связи для ответа.</p>
+  </div>
+  <div class="section"><h2>Проверить путь</h2><button class="preset" data-preset="input">0 · Вход сразу во все координаты L1</button><button class="preset" data-preset="bridge">1 · Перемычка L1[17] → L3[17]</button><button class="preset" data-preset="mix">2 · Следующий хоп: L3[17] → L3[73]</button><button class="preset" data-preset="return">2 · Обратное направление: L3[17] → L2[73]</button><p class="note">Это просмотр существующих вкладов на одном префиксе. Отдельный маршрут не выбирается; остальные связи тоже работают.</p></div>
+</aside>
+<section class="scene" aria-label="Интерактивный трёхмерный граф модели">
+  <div class="scene-top"><div><strong id="sceneTitle">3 слоя · 128 координат</strong><small id="sceneSubtitle"></small><small id="edgeCount"></small><small id="activitySummary"></small></div><div class="top-buttons"><button id="home">Сброс камеры</button><button id="exportPng">Снимок PNG</button></div></div>
+  <canvas id="graph" tabindex="0" aria-label="3D: тяните для поворота, колесо для масштаба, щёлкните нейрон для разбора"></canvas>
+  <div class="tooltip" id="tooltip"></div>
+  <div class="legend" id="legend"></div>
+  <div class="timeline"><div class="hop-row"><button id="play" title="Проиграть записанные хопы">▶ Хопы</button><input type="range" id="hop" min="0" max="8" value="4" step="1" aria-label="Хоп"><b class="number" id="hopLabel">4 / 8</b></div><div class="tickrow" id="ticks"></div><div class="stats"><span><b id="denseCount"></b> плотных рёбер</span><span><b id="bridgeCount"></b> перемычек</span><span><b>8</b> выходных горизонтов</span></div><p class="note">Поворот — перетаскивание · масштаб — колесо · выбор — щелчок. Хопы дискретны, обновление всех уровней синхронное.</p></div>
+</section>
+<aside class="right">
+ <nav class="tabs"><button data-tab="state" class="active">Нейрон</button><button data-tab="attention">История</button><button data-tab="output">Выход</button><button data-tab="code">Код</button></nav>
+ <div class="row spread"><select id="layer" aria-label="Слой выбранного нейрона"><option value="0">Слой 1</option><option value="1">Слой 2</option><option value="2">Слой 3</option></select><label class="row tiny">№ <input type="number" id="coordinate" min="0" max="127" value="42" aria-label="Номер нейрона"></label></div>
+ <section id="state" class="tab active"><h3 id="neuronTitle"></h3><div id="decomposition"></div><details><summary>Где именно вычисляется новое состояние</summary><div class="equation" id="hopEquation"></div><p>Все правые части берут состояния xᵏ. MLP нелинеен и смешивает координаты. Перемычка прибавляется после этой обработки; norm/MLP получателя её в этом хопе не обрабатывают.</p></details><h3>Входящие синапсы · наибольшие |Δx|</h3><div id="edgeList"></div><div id="edgeDetail"></div><details><summary>MLP: скрытые координаты тоже существуют</summary><p id="mlpDimensions"></p><div id="mlpList"></div><p>Показаны пять наибольших вкладов down[k,j] · SiLU(gate[j]) · value[j] · s. Полный MLP участвует в forward.</p></details></section>
+ <section id="attention" class="tab"><h3>Причинное внимание внутри уровня</h3><p class="note">Это связи с <b>прошлыми позициями</b> текста на том же уровне и хопе. Они не являются дополнительными рёбрами внутри нарисованного кольца одного байта.</p><label class="control tiny">Голова внимания<select id="head" aria-label="Голова внимания"></select></label><div id="attentionBars"></div><div class="equation">Q, K = RoPE(Wq·RMS(xᵏ), Wk·RMS(xᵏ))
+V = Wv·RMS(xᵏ)
+a = Wo · softmax(QKᵀ/√d + mask) · V
+mask: только t′ &lt; t</div><p class="note">Веса показываются для одной головы. Q/K/V и выходная проекция плотные. Будущие байты и текущая позиция исключены; у BOS нет прошлых позиций.</p></section>
+ <section id="output" class="tab"><h3>Настоящий конечный декодер</h3><p class="note">Только L3 после всех 8 хопов. Ползунок хопа меняет просмотр транспорта; эти логиты всегда относятся к финальному состоянию выбранного байта.</p><div class="flow-step"><b>RMSNorm → 8 × Linear(<span class="dimN">128</span>, 257)</b>h1: следующий байт; h2…h8: дополнительные горизонты.</div><div class="flow-step"><b>Отдельный адрес → причинный ridge</b>Коррекция использует только уже наблюдённые ошибки s+h ≤ t; затем прибавляется к сырым логитам.</div><div id="outputMemory"></div><div class="output-grid" id="outputLogits"></div><p class="note">Это случайные веса: вероятности приведены для проверки вычисления, а не качества языка. При g памяти = 0 ветка существует, но не меняет ответ.</p></section>
+ <section id="code" class="tab"><h3>Проверяемое соответствие коду</h3><div id="audit"></div><div id="moduleContract"></div><details><summary>Что именно обозначает картинка</summary><p><span id="dimTotal">384</span> точки — координаты состояний трёх уровней на одной позиции текста. Нормировки, attention, MLP и decoder показаны свёрнутыми блоками с точными размерностями; их внутренние матрицы не нарисованы как дополнительные 3D-нейроны. Семь N×N блоков транспорта представлены рёбрами без факторизации. Геометрия и толщина линии не участвуют в forward.</p><p>Каждая RMSNorm зависит от всех N координат своего вектора. Граф нарисованных синапсов поэтому не является полным графом производных всех операторов.</p><p>Цвет нейрона — фактическое состояние после выбранного хопа; ток связи вычислен из старого состояния. Отрицательное значение тока не разворачивает ребро. Self-ребро плотной матрицы и residual — разные операции. Фильтр сильных токов не обозначает разреженный алгоритм.</p><p>Новых весов в браузере не вычисляется: это проверенная записанная трасса. Все режимы — реальные запуски одного и того же префикса на указанных вариантах кода. Ни FF, ни STDP не добавлены в эту ветку визуализацией.</p></details><p class="note" id="provenance"></p><div id="sources"></div></section>
+</aside>
+</main>
+<script type="application/json" id="trace-data">__TRANSPORT_DATA__</script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const DATA=JSON.parse($('trace-data').textContent,(_key,v)=>{
+  if(v&&v.dtype==='float32-le'){const raw=atob(v.data),bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);return {shape:v.shape,values:new Float32Array(bytes.buffer)};}return v;
+});
+const N=DATA.cfg.neurons,L=DATA.cfg.layers,H=DATA.cfg.hops,T=DATA.ids.length,HEADS=DATA.cfg.heads,S=DATA.step_scale;
+const at=(a,...indices)=>{let k=0;for(let i=0;i<indices.length;i++)k=k*a.shape[i]+indices[i];return a.values[k];};
+const fmt=x=>Number(x).toFixed(6),sgn=x=>(x>=0?'+':'')+fmt(x),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const byte=b=>b===256?'BOS/EOS':b===32?'␠':b===10?'↵':b>=33&&b<127?String.fromCharCode(b):'0x'+b.toString(16).padStart(2,'0');
+const cv=$('graph'),ctx=cv.getContext('2d');
+let variant=DATA.variants.find(v=>v.id==='bridges_open'),position=T-1,hop=4,layer=2,neuron=Math.min(42,N-1),head=0;
+let yaw=-.38,pitch=.34,zoom=1,selectedEdge=null,playing=null,viewEdges=[],allEdges=[],points=[],projection=[],edgeMax=1,stateScale=1,drawQueued=false;
+let width=800,height=680,drag=null,hover=-1;
+const nodeId=(l,j)=>l*N+j;
+for(let l=0;l<L;l++)for(let j=0;j<N;j++){const a=2*Math.PI*j/N;points.push([1.57*Math.cos(a),(1-l)*1.7,1.57*Math.sin(a)]);}
+const topology=[];
+for(const key of DATA.edge_keys){const [target,source]=key.split('_').map(Number);for(let i=0;i<N;i++)for(let j=0;j<N;j++)topology.push({key,target,source,i,j,kind:target===source?'intra':'adjacent'});}
+function project(p){const xx=p[0]*Math.cos(yaw)+p[2]*Math.sin(yaw),zz=-p[0]*Math.sin(yaw)+p[2]*Math.cos(yaw),yy=p[1]*Math.cos(pitch)-zz*Math.sin(pitch),z=p[1]*Math.sin(pitch)+zz*Math.cos(pitch);const f=Math.min(width*1.20,(height-88)*1.10)*zoom/(7.15-z);return {x:width*.50+xx*f,y:height*.51-yy*f,z,f};}
+function valueCurrent(e){
+  if(hop===0)return 0;
+  const p=variant.parameters, tr=variant.trace,k=hop-1;
+  if(e.kind==='bridge')return S*at(p.bridges[e.key],e.i)*at(tr.states,k,e.source,position,e.j);
+  const b=p.edges[e.key],x=at(tr.normalized,k,e.source,position,e.j),index=e.i*N+e.j;
+  let v=b.weight.values[index]*x;
+  if(b.coefficients){const phase=b.frequency.values[e.j]*x;v+=b.coefficients.values[index]*Math.sin(phase)+b.coefficients.values[N*N+index]*(Math.cos(phase)-1);}
+  return S*b.gain*v/Math.sqrt(e.target===1?3:2);
+}
+function edgeEqual(a,b){return !!a&&!!b&&a.key===b.key&&a.i===b.i&&a.j===b.j&&a.kind===b.kind;}
+function currentColor(x,alpha=1){return x>=0?`rgba(81,220,207,${alpha})`:`rgba(255,181,106,${alpha})`;}
+function lineColor(e,alpha){if($('colorMode').value==='family'){const c={intra:'123,174,255',adjacent:'81,220,207',bridge:'184,153,255'}[e.kind];return `rgba(${c},${alpha})`;}return currentColor(e.current,alpha);}
+function allowed(e){
+  if(!$(e.kind==='bridge'?'bridges':e.kind).checked)return false;
+  if(!$('zeros').checked&&e.current===0)return false;
+  const incoming=e.target===layer&&e.i===neuron,outgoing=e.source===layer&&e.j===neuron;
+  if($('scope').value==='star'){const dir=$('direction').value;return dir==='in'?incoming:dir==='out'?outgoing:incoming||outgoing;}
+  return true;
+}
+function rebuild(){
+  const extra=[];
+  for(const key of Object.keys(variant.parameters.bridges)){const [target,source]=key.split('_').map(Number);for(let i=0;i<N;i++)extra.push({key,target,source,i,j:i,kind:'bridge'});}
+  allEdges=topology.concat(extra).map(e=>({...e,current:valueCurrent(e)}));
+  if($('scaleMode').value==='shared'){edgeMax=DATA.visualization_scales.current;stateScale=DATA.visualization_scales.state;}
+  else{edgeMax=allEdges.reduce((m,e)=>Math.max(m,Math.abs(e.current)),1e-6);stateScale=Math.max(variant.statistics.max_abs_state*.42,.2);}
+  filterEdges();updatePanels();requestDraw();
+}
+function filterEdges(){
+  viewEdges=allEdges.filter(allowed);
+  if($('scope').value==='strong')viewEdges.sort((a,b)=>Math.abs(b.current)-Math.abs(a.current)),viewEdges=viewEdges.slice(0,512);
+  $('edgeCount').textContent=hop===0?'Вход: вся строка embedding → все N координат L1':`${viewEdges.length.toLocaleString('ru-RU')} из ${allEdges.length.toLocaleString('ru-RU')} рёбер показано · фильтр изображения`;
+}
+function drawLine(a,b,color,lineWidth=1,arrow=false,dashed=false,split=false){
+  ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=lineWidth;ctx.setLineDash(dashed?[3,4]:[]);
+  if(Math.hypot(b.x-a.x,b.y-a.y)<1){ctx.arc(a.x-7,a.y+7,6,.3,Math.PI*1.92);ctx.stroke();ctx.setLineDash([]);return;}
+  const dx=b.x-a.x,dy=b.y-a.y,m=Math.hypot(dx,dy),ux=dx/m,uy=dy/m,bend=split?3:0;
+  ctx.moveTo(a.x,a.y);if(split)ctx.quadraticCurveTo((a.x+b.x)/2-uy*bend,(a.y+b.y)/2+ux*bend,b.x,b.y);else ctx.lineTo(b.x,b.y);ctx.stroke();ctx.setLineDash([]);
+  if(arrow){const px=a.x+dx*.76-uy*bend*.365,py=a.y+dy*.76+ux*bend*.365,s=4+lineWidth;ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px-ux*s-uy*s*.42,py-uy*s+ux*s*.42);ctx.lineTo(px-ux*s+uy*s*.42,py-uy*s-ux*s*.42);ctx.closePath();ctx.fill();}
+}
+function worldLine(a,b,color,w=1,arrow=false,dashed=false){drawLine(project(a),project(b),color,w,arrow,dashed);}
+function label(world,title,subtitle,color='#aec8dd',boxWidth=125){
+  const p=project(world),bh=subtitle?36:23;ctx.fillStyle='#0b1725ed';ctx.strokeStyle='#35516a';ctx.lineWidth=.8;ctx.beginPath();ctx.roundRect(p.x-boxWidth/2,p.y-bh/2,boxWidth,bh,5);ctx.fill();ctx.stroke();ctx.textAlign='center';ctx.font='600 10px system-ui';ctx.fillStyle=color;ctx.fillText(title,p.x,p.y+(subtitle?-3:4));if(subtitle){ctx.font='9px system-ui';ctx.fillStyle='#849db5';ctx.fillText(subtitle,p.x,p.y+11);}}
+function draw(){
+  drawQueued=false;ctx.clearRect(0,0,width,height);projection=points.map(project);
+  // The rings are dotted guides, never an implied chain of adjacent neurons.
+  for(let l=0;l<L;l++){
+    ctx.beginPath();ctx.strokeStyle='#46607766';ctx.lineWidth=1;ctx.setLineDash([2,6]);
+    for(let j=0;j<=N;j++){const p=projection[nodeId(l,j%N)];j?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);}ctx.stroke();ctx.setLineDash([]);
+  }
+  if(hop===0&&$('modules').checked){const start=project([-1.1,2.83,0]);for(let j=0;j<N;j++){const v=at(variant.trace.states,0,0,position,j);drawLine(start,projection[j],currentColor(v,.25),.8,j%8===0);}}
+  if(hop>0){
+    for(const e of viewEdges){
+      const selected=edgeEqual(e,selectedEdge),ratio=Math.min(1,Math.abs(e.current)/edgeMax),dense=$('scope').value==='all';
+      const alpha=selected?1:dense?.012+.10*Math.sqrt(ratio):.045+.60*Math.sqrt(ratio);
+      const a=projection[nodeId(e.source,e.j)],b=projection[nodeId(e.target,e.i)];
+      drawLine(a,b,selected?'#f2d7ff':lineColor(e,alpha),selected?2.8:e.kind==='bridge'?1.1+ratio: .55+ratio*.9,!dense&&(ratio>.09||selected),e.current===0,!dense);
+    }
+    if($('residual').checked){
+      const selected=nodeId(layer,neuron),p=projection[selected];ctx.strokeStyle='#e0c878';ctx.lineWidth=1.6;ctx.beginPath();ctx.arc(p.x+9,p.y-8,10,.35,Math.PI*1.94);ctx.stroke();ctx.fillStyle='#e0c878';ctx.font='10px system-ui';ctx.textAlign='left';ctx.fillText('xᵏ → xᵏ⁺¹',p.x+17,p.y-15);
+    }
+  }
+  if($('modules').checked){
+    for(let l=0;l<L;l++){
+      const y=(1-l)*1.7;
+      // These are labelled vector-module connectors, never scalar synapses.
+      worldLine([-2.45,y,0],[0,y,0],'#74aadc42',1,true,true);
+      worldLine([0,y+.09,0],[2.42,y+.09,0],'#80a6ba42',1,true,true);
+      worldLine([2.42,y-.09,0],[0,y-.09,0],'#80a6ba42',1,true,true);
+      label([-2.50,y,0],'Attention · t′ < t',`${HEADS} голов · Q/K/V + RoPE`,'#8ab5ff',117);
+      label([2.48,y,0],'MLP + RMSNorm',`${N} → ${4*N} → ${2*N} → ${N}`,'#b3d1df',121);
+    }
+    label([-1.1,2.83,0],`Embedding [${DATA.ids[position]}]`,`${DATA.cfg.vocab} × ${N} · весь вектор`,'#69e3d0',140);
+    const out=project([1.02,-2.78,0]);for(let j=0;j<N;j++)drawLine(projection[nodeId(2,j)],out,'#698ba426',.5,j%8===0);
+    label([1.02,-2.78,0],'L3 → 8 горизонтов','RMSNorm · Linear + ridge','#74e0d3',149);
+  }
+  const ordered=projection.map((p,i)=>({...p,i})).sort((a,b)=>a.z-b.z);
+  for(const p of ordered){
+    const l=Math.floor(p.i/N),j=p.i%N,v=at(variant.trace.states,hop,l,position,j),intensity=Math.min(1,Math.abs(v)/stateScale),selected=l===layer&&j===neuron;
+    const radius=selected?5.5:2.05+intensity*1.4;
+    ctx.fillStyle=intensity<.00001?'#34465a':currentColor(v,.35+.65*Math.sqrt(intensity));
+    if(selected){ctx.shadowColor='#a6ece7';ctx.shadowBlur=13;}ctx.beginPath();ctx.arc(p.x,p.y,radius,0,2*Math.PI);ctx.fill();ctx.shadowBlur=0;
+    if(selected||p.i===hover){ctx.strokeStyle='#e5f7ff';ctx.lineWidth=1;ctx.beginPath();ctx.arc(p.x,p.y,radius+3,0,2*Math.PI);ctx.stroke();ctx.font='600 11px system-ui';ctx.textAlign='left';ctx.fillStyle='#eef8ff';ctx.fillText(`L${l+1}[${j}]`,p.x+12,p.y+15);}
+  }
+  for(let l=0;l<L;l++){const p=project([0,(1-l)*1.7+.56,0]);ctx.fillStyle='#e1edf5';ctx.font='600 12px system-ui';ctx.textAlign='center';ctx.fillText(`L${l+1}  /  ${N}`,p.x,p.y);}
+  if(selectedEdge&&hop>0){const e=allEdges.find(e=>edgeEqual(e,selectedEdge));if(e&&viewEdges.some(q=>edgeEqual(q,e))){drawLine(projection[nodeId(e.source,e.j)],projection[nodeId(e.target,e.i)],'#edceff',2.2,true,false,true);}}
+}
+function requestDraw(){if(!drawQueued){drawQueued=true;requestAnimationFrame(draw);}}
+function resize(){const r=cv.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);width=r.width;height=r.height;cv.width=Math.round(width*dpr);cv.height=Math.round(height*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);requestDraw();}
+function selectNode(l,j){layer=l;neuron=j;selectedEdge=null;$('layer').value=layer;$('coordinate').value=neuron;filterEdges();updatePanels();requestDraw();}
+function tableRow(title,value,total=false){return `<tr class="${total?'total':''}"><td>${title}</td><td class="number ${value<0?'negative':'positive'}">${sgn(value)}</td></tr>`;}
+function updatePanels(){
+  const tr=variant.trace,k=Math.max(0,hop-1),s=variant.parameters;
+  $('hop').value=hop;$('hopLabel').textContent=`${hop} / ${H}`;
+  $('sceneTitle').textContent=`${L} слоя × ${N} координат · ${hop?'хоп '+hop:'вход'}`;
+  $('sceneSubtitle').textContent=hop?`Цвет: x${hop} · токи: x${hop-1} → x${hop} · s = ${S}`:'Embedding инициализирует L1; L2 и L3 нулевые';
+  $('modelNote').textContent=variant.note;$('modelClass').textContent=variant.class_name.replace('TransportMachine','');
+  $('denseCount').textContent=topology.length.toLocaleString('ru-RU');$('bridgeCount').textContent=Object.keys(s.bridges).length*N;
+  $('positionLabel').textContent=`t=${position} · ID=${DATA.ids[position]} · доступно ${position} прошлых позиций`;
+  const activity=[];for(let l=0;l<L;l++){let sq=0,nz=0;for(let j=0;j<N;j++){const x=at(tr.states,hop,l,position,j);sq+=x*x;if(x!==0)nz++;}activity.push({rms:Math.sqrt(sq/N),nz});}
+  $('activitySummary').textContent=`RMS L1/L2/L3: ${activity.map(a=>a.rms.toFixed(3)).join(' / ')} · ненулевых: ${activity.map(a=>a.nz).join(' / ')}`;
+  $('prefix').textContent=DATA.text;$('tokens').innerHTML=DATA.ids.map((b,i)=>`<button class="token ${i===position?'selected':''} ${i>position?'future':''}" data-position="${i}" title="t=${i}, byte=${b}">${esc(byte(b))}</button>`).join('');
+  $('legend').innerHTML=`<span class="dot" style="background:#51dccf"></span> + значение &nbsp; <span class="dot" style="background:#ffb56a"></span> − значение<br>${$('colorMode').value==='family'?'<span style="color:#7baeff">Внутри</span> · <span style="color:#51dccf">соседи</span> · <span style="color:#b899ff">перемычки</span><br>':''}<span style="color:#e0c878">↻</span> residual выбранной координаты<br>Пунктир кольца — разметка, не рёбра<br>Пунктир к блоку — целый вектор, ${N} координат<br>${$('scaleMode').value==='shared'?'Общая шкала':'Авто: яркость между режимами несопоставима'}<br>Состояния: ±${stateScale.toFixed(2)} · токи: ±${edgeMax.toFixed(3)}`;
+  $('neuronTitle').textContent=`L${layer+1}[${neuron}] · t=${position} · ${hop?'хоп '+hop:'инициализация'}`;
+  if(!hop){$('decomposition').innerHTML='<table class="value-table">'+tableRow('x⁰',at(tr.states,0,layer,position,neuron),true)+'</table><p class="note">Токи хопа ещё не вычислялись. В L1 копируется выбранная строка embedding; остальные уровни нулевые.</p>';$('edgeList').innerHTML='';$('edgeDetail').innerHTML='';}
+  else{
+    let rows=tableRow('Сохранено xᵏ',at(tr.states,k,layer,position,neuron));
+    DATA.edge_keys.forEach((key,index)=>{if(Number(key.split('_')[0])===layer)rows+=tableRow(`Δ от L${Number(key.split('_')[1])+1} · плотный блок`,S*at(tr.messages,k,index,position,neuron));});
+    rows+=tableRow('Δ временное внимание',S*at(tr.attention,k,layer,position,neuron));
+    rows+=tableRow('Δ MLP',S*at(tr.mlp,k,layer,position,neuron));
+    rows+=tableRow('Δ перемычка',at(tr.bridge,k,layer,position,neuron));
+    rows+=tableRow('Итог xᵏ⁺¹',at(tr.states,hop,layer,position,neuron),true);
+    $('decomposition').innerHTML='<table class="value-table">'+rows+'</table>';
+    const incoming=allEdges.filter(e=>e.target===layer&&e.i===neuron).sort((a,b)=>Math.abs(b.current)-Math.abs(a.current)).slice(0,8);
+    $('edgeList').innerHTML=incoming.map(e=>`<button class="edge-button ${edgeEqual(e,selectedEdge)?'chosen':''}" data-edge="${e.key}:${e.i}:${e.j}:${e.kind}"><span>L${e.source+1}[${e.j}] ${e.kind==='bridge'?'· перемычка':''}</span><span class="number ${e.current<0?'negative':'positive'}">${sgn(e.current)}</span></button>`).join('');
+    edgeDetail();
+  }
+  $('hopEquation').textContent=`uⱼ = RMSNorm(xⱼᵏ)\nfᵢ = Σⱼ edgeᵢⱼ(uⱼ)/√mᵢ + attentionᵢ(uᵢ)\nvᵢ = RMSNorm(xᵢᵏ + s·fᵢ)\nxᵢᵏ⁺¹ = xᵢᵏ + s·[fᵢ + MLPᵢ(vᵢ)]\n          + s·gᵢⱼ ⊙ xⱼᵏ\ns=${S}; m=[2,3,2]; i,j = уровни`;
+  $('mlpDimensions').textContent=`${N} → две ветки по ${N*2} → SiLU(gate) × value → ${N}. Это ${N*4} входных проекций и ${N*2} промежуточных координат на уровень, а не N независимых скалярных активаций.`;
+  const mlp=[];for(let j=0;j<N*2;j++){const g=at(tr.gate,k,layer,position,j),v=at(tr.value,k,layer,position,j),d=at(DATA.shared.mlp_down,layer,neuron,j);mlp.push({j,current:S*d*(g/(1+Math.exp(-g)))*v});}mlp.sort((a,b)=>Math.abs(b.current)-Math.abs(a.current));
+  $('mlpList').innerHTML=hop?mlp.slice(0,5).map(m=>`<div class="row spread tiny"><span>скрытая ${m.j}</span><span class="number">${sgn(m.current)}</span></div>`).join(''):'До первого хопа MLP не вычислялся.';
+  const aw=tr.attention_weights;let bars='';for(let t=0;t<T;t++){const w=hop?at(aw,k,layer,head,position,t):0;bars+=`<div class="barline"><span>${t}: ${esc(byte(DATA.ids[t]))}</span><div class="track"><div class="fill" style="width:${w*100}%"></div></div><span>${w.toFixed(3)}</span></div>`;}$('attentionBars').innerHTML=bars;
+  let outs='';for(let h=0;h<DATA.cfg.horizons;h++){const log=[];for(let v=0;v<DATA.cfg.vocab;v++)log.push({v,x:at(tr.logits,position,h,v)});const m=Math.max(...log.map(o=>o.x)),z=log.reduce((a,o)=>a+Math.exp(o.x-m),0);log.sort((a,b)=>b.x-a.x);outs+=`<div class="horizon"><b>h${h+1} · t+${h+1}</b>${log.slice(0,3).map(o=>`<span>${esc(byte(o.v))} &nbsp; ${(100*Math.exp(o.x-m)/z).toFixed(2)}%</span>`).join('')}</div>`;}$('outputLogits').innerHTML=outs;
+  $('outputMemory').innerHTML=`<div class="equation">λ ridge = ${s.ridge.toFixed(6)}\n8·tanh(g₁) = ${at(s.plastic_gain,0).toFixed(6)}\nЧисло доступных пар h1: ${position}</div>`;
+  const a=variant.audit,max=Math.max(...['edge_sum','field_norm_input','mlp_output','hop_state','attention_output','decoder','future_invariance'].map(n=>a[n]));
+  $('audit').innerHTML=`<div class="proof">● Запись не изменила выход: побитовое равенство.<br>Макс. ошибка реконструкции: ${max.toExponential(2)}.<br>Ток внимания из будущего: 0.</div><table class="value-table">${Object.entries(a).filter(([n,v])=>typeof v==='number'&&n!=='positions'&&n!=='recorded_hops').map(([n,v])=>`<tr><td>${esc(n)}</td><td class="number">${v.toExponential(2)}</td></tr>`).join('')}</table>`;
+  $('moduleContract').innerHTML=`<details open><summary>Полный состав графа</summary><p>Embedding: ${DATA.cfg.vocab} × ${N}.<br>Транспорт: 7 независимых блоков ${N}×${N}, общих для ${H} хопов.<br>Перемычки: ${Object.keys(s.bridges).length} × ${N}; независимые направления.<br>На уровне: 2 RMSNorm; QKV ${N}→${N*3}, выход внимания ${N}→${N}; gated MLP ${N}→${N*4}→${N*2}→${N}.<br>Выход: final RMSNorm; ${DATA.cfg.horizons}×${DATA.cfg.vocab}×${N} readout; адрес ${N}×${N}; ridge и ${DATA.cfg.horizons} коэффициентов памяти.<br>Всего обучаемых параметров: ${variant.parameter_count.toLocaleString('ru-RU')}.</p></details>`;
+}
+function edgeDetail(){
+  const e=selectedEdge&&allEdges.find(q=>edgeEqual(q,selectedEdge));
+  if(!e||hop===0){$('edgeDetail').innerHTML='<p class="note">Нажмите строку синапса, чтобы увидеть его вес, вход и точный вклад. Список учитывает все входящие рёбра, независимо от фильтра картинки.</p>';return;}
+  const p=variant.parameters,k=hop-1;
+  let text=`L${e.source+1}[${e.j}] → L${e.target+1}[${e.i}]\n`;
+  if(e.kind==='bridge'){const gain=at(p.bridges[e.key],e.i),x=at(variant.trace.states,k,e.source,position,e.j);text+=`Δx = s · g · x_old\n   = ${S} · ${fmt(gain)} · ${fmt(x)}\n   = ${sgn(e.current)}`;}
+  else{const b=p.edges[e.key],x=at(variant.trace.normalized,k,e.source,position,e.j),w=at(b.weight,e.i,e.j);text+=`u = RMS(x_old)[${e.j}] = ${fmt(x)}\nW = ${fmt(w)}\nf(u) = W·u`;
+    if(b.coefficients)text+=` + a·sin(ωu) + b·(cos(ωu)−1)\na=${fmt(at(b.coefficients,0,e.i,e.j))}\nb=${fmt(at(b.coefficients,1,e.i,e.j))}; ω=${fmt(at(b.frequency,e.j))}`;
+    text+=`\nΔx = s·gain·f(u)/√${e.target===1?3:2}\n    = ${sgn(e.current)}`;
+  }
+  $('edgeDetail').innerHTML=`<div class="equation">${esc(text)}</div><p class="note">Это прямой слагаемый транспорта. Его последующее влияние через RMSNorm/MLP и следующие хопы не равно этому числу.</p>`;
+}
+function changeHop(h){hop=h;selectedEdge=null;rebuild();}
+$('variant').innerHTML=DATA.variants.map(v=>`<option value="${v.id}">${esc(v.title)}</option>`).join('');$('variant').value=variant.id;
+$('headerDimensions').textContent=`${L} × ${N} · ${H} хопов · ${DATA.cfg.horizons} горизонтов · seed ${DATA.seed}`;
+document.querySelectorAll('.dimN').forEach(e=>e.textContent=N);$('dimTotal').textContent=L*N;
+$('coordinate').max=N-1;$('layer').value=layer;$('coordinate').value=neuron;
+$('ticks').innerHTML=Array.from({length:H+1},(_,i)=>`<span>${i}</span>`).join('');
+$('head').innerHTML=Array.from({length:HEADS},(_,i)=>`<option value="${i}">${i+1} / ${HEADS}</option>`).join('');
+$('provenance').textContent=DATA.provenance+' · '+DATA.generated_at;
+$('sources').innerHTML=DATA.sources.map(s=>`<details><summary class="source-title">${esc(s.path)}</summary><p class="source-title">SHA256 ${s.sha256}</p><pre>${esc(s.text.split('\n').map((line,i)=>String(i+1).padStart(4)+'  '+line).join('\n'))}</pre></details>`).join('');
+$('variant').addEventListener('change',()=>{variant=DATA.variants.find(v=>v.id===$('variant').value);selectedEdge=null;rebuild();});
+$('hop').addEventListener('input',()=>changeHop(Number($('hop').value)));
+$('tokens').addEventListener('click',e=>{const b=e.target.closest('[data-position]');if(b){position=Number(b.dataset.position);selectedEdge=null;rebuild();}});
+$('layer').addEventListener('change',()=>selectNode(Number($('layer').value),neuron));
+$('coordinate').addEventListener('change',()=>selectNode(layer,Math.max(0,Math.min(N-1,Math.floor(Number($('coordinate').value)||0)))));
+$('head').addEventListener('change',()=>{head=Number($('head').value);updatePanels();});
+for(const id of ['scope','direction','intra','adjacent','bridges','zeros','residual','modules','colorMode'])$(id).addEventListener('change',()=>{filterEdges();updatePanels();requestDraw();});
+$('scaleMode').addEventListener('change',rebuild);
+$('edgeList').addEventListener('click',event=>{const b=event.target.closest('[data-edge]');if(!b)return;const [key,i,j,kind]=b.dataset.edge.split(':');selectedEdge={key,i:Number(i),j:Number(j),kind};updatePanels();requestDraw();});
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.id===b.dataset.tab));}));
+document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>{
+  const p=b.dataset.preset,i=Math.min(17,N-1),j=Math.min(73,N-1);$('scope').value='star';$('direction').value='both';
+  $('intra').checked=p==='mix';$('adjacent').checked=p==='return';$('bridges').checked=p==='bridge';$('zeros').checked=false;
+  if(p==='input'){hop=0;layer=0;neuron=i;selectedEdge=null;}
+  else{if(!Object.keys(variant.parameters.bridges).length||variant.bridge_gain===0){variant=DATA.variants.find(v=>v.id==='bridges_open');$('variant').value=variant.id;}
+    hop=p==='bridge'?1:2;layer=p==='return'?1:2;neuron=p==='bridge'?i:j;
+    selectedEdge=p==='bridge'?{key:'2_0',i,j:i,kind:'bridge'}:p==='mix'?{key:'2_2',i:j,j:i,kind:'intra'}:{key:'1_2',i:j,j:i,kind:'adjacent'};
+  }$('layer').value=layer;$('coordinate').value=neuron;rebuild();
+}));
+$('play').addEventListener('click',()=>{if(playing){clearInterval(playing);playing=null;$('play').textContent='▶ Хопы';}else{$('play').textContent='Ⅱ Стоп';playing=setInterval(()=>changeHop((hop+1)%(H+1)),1400);}});
+$('home').addEventListener('click',()=>{yaw=-.38;pitch=.34;zoom=1;requestDraw();});
+$('exportPng').addEventListener('click',()=>{draw();const output=document.createElement('canvas'),dpr=cv.width/width,band=118*dpr;output.width=cv.width;output.height=cv.height+band;const c=output.getContext('2d');c.fillStyle='#0b1522';c.fillRect(0,0,output.width,output.height);c.drawImage(cv,0,band);c.fillStyle='#dcecf4';c.font=`${15*dpr}px system-ui`;c.fillText(`DRREM · ${variant.title} · ${L} × ${N} · t=${position} · хоп ${hop}/${H}`,18*dpr,25*dpr);c.fillStyle='#a4b8cc';c.font=`${11*dpr}px system-ui`;c.fillText('Демонстрационные веса, не обученный checkpoint. Радиальное расположение — только визуализация.',18*dpr,46*dpr);c.fillText(`Реальный CPU / FP32 forward · seed ${DATA.seed} · показано ${hop?viewEdges.length:0}/${allEdges.length} рёбер транспорта.`,18*dpr,65*dpr);c.fillText('Цвет точки: состояние после хопа. Токи: из старых состояний. Пунктир к модулю: весь вектор.',18*dpr,83*dpr);c.fillText(`Шкала: ${$('scaleMode').value==='shared'?'общая':'авто — не сравнивать яркость'} · состояние ±${stateScale.toFixed(3)} · ток ±${edgeMax.toFixed(5)}`,18*dpr,103*dpr);const a=document.createElement('a');a.download=`DRREM-${variant.id}-t${position}-hop${hop}.png`;a.href=output.toDataURL('image/png');a.click();});
+function locate(event){const box=cv.getBoundingClientRect();return {x:event.clientX-box.left,y:event.clientY-box.top};}
+function nearest(p){let best=-1,d=14;projection.forEach((q,i)=>{const distance=Math.hypot(p.x-q.x,p.y-q.y);if(distance<d){d=distance;best=i;}});return best;}
+cv.addEventListener('pointerdown',e=>{drag={...locate(e),sx:e.clientX,sy:e.clientY,yaw,pitch};cv.setPointerCapture(e.pointerId);$('tooltip').style.display='none';});
+cv.addEventListener('pointermove',e=>{const p=locate(e);if(drag){yaw=drag.yaw+(e.clientX-drag.sx)*.007;pitch=Math.max(-1.4,Math.min(1.4,drag.pitch+(e.clientY-drag.sy)*.006));requestDraw();}else{const i=nearest(p);if(i!==hover){hover=i;requestDraw();}const tip=$('tooltip');if(i>=0){const l=Math.floor(i/N),j=i%N;tip.textContent=`L${l+1}[${j}] · x${hop}=${fmt(at(variant.trace.states,hop,l,position,j))}`;tip.style.left=Math.min(width-210,p.x+13)+'px';tip.style.top=(p.y+15)+'px';tip.style.display='block';}else tip.style.display='none';}});
+cv.addEventListener('pointerup',e=>{if(drag&&Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<5){const i=nearest(locate(e));if(i>=0)selectNode(Math.floor(i/N),i%N);}drag=null;});
+cv.addEventListener('pointercancel',()=>{drag=null;});cv.addEventListener('pointerleave',()=>{$('tooltip').style.display='none';hover=-1;requestDraw();});
+cv.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.max(.55,Math.min(2.0,zoom*Math.exp(-e.deltaY*.001)));requestDraw();},{passive:false});
+cv.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowRight'){e.preventDefault();selectNode(layer,(neuron+(e.key==='ArrowRight'?1:N-1))%N);}if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();selectNode((layer+(e.key==='ArrowDown'?1:L-1))%L,neuron);}});
+new ResizeObserver(resize).observe(cv);rebuild();resize();
+// Narrow read-only interface for browser acceptance checks; no model mutation.
+window.DRREM_VIEW={get state(){return {variant:variant.id,hop,position,layer,neuron,renderedEdges:viewEdges.length,existingEdges:allEdges.length,canvasWidth:width,canvasHeight:height,camera:{yaw,pitch,zoom},scales:{state:stateScale,current:edgeMax,mode:$('scaleMode').value}};},get audit(){return variant.audit;},data:DATA};
+</script>
+</body></html>

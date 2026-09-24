@@ -1,0 +1,266 @@
+{
+  "RESULTS.md": {
+    "bytes": 11243,
+    "sha256": "62065dfe261da4b742759cb5b49a4df0bf2dd5a9d675092dcc57f3cdc6deb045"
+  },
+  "balanced/energy.jsonl": {
+    "bytes": 159894,
+    "sha256": "cd664d09026678dacc18bb8a637a3690037bf7aef639b46ffc0bb90c00d63ab3"
+  },
+  "balanced/energy.protocol.json": {
+    "bytes": 2479616,
+    "sha256": "9302b3c1447c17c6e9cfc859510a3c374d0764e5ed9a45436c0d8544ef8bbac0"
+  },
+  "balanced/energy.pt": {
+    "bytes": 67250902,
+    "sha256": "120fee404e6611821f4886351c91eb3b8936600c270c0321236c91af5de3f17a"
+  },
+  "balanced/source/config.py": {
+    "bytes": 8799,
+    "sha256": "6933822faa211e4d1dd0be6b002844006adef70dcda6e96152a2543218d4a008"
+  },
+  "balanced/source/openorca.py": {
+    "bytes": 6508,
+    "sha256": "f9e39f5dd679d252c01a11e22f1d818c195b708b56381159d27fe30533a37ed4"
+  },
+  "balanced/source/predictive_energy.py": {
+    "bytes": 13773,
+    "sha256": "7e67826fce6a24f1c6685c3010666f1c32f1c1e0ed678bb3c2db53ef935718ab"
+  },
+  "balanced/source/protocol.py": {
+    "bytes": 3350,
+    "sha256": "dc25cc0643bc4390402b9408ef254aa0071ce335ee84a82267b388949399ec7b"
+  },
+  "balanced/source/rrem_repaired.py": {
+    "bytes": 58125,
+    "sha256": "8580c1a9a670c3e92fa72049e8e4bec0121a99d43ce961f5b2153d0fac384f63"
+  },
+  "diagnostics.json": {
+    "bytes": 18427,
+    "sha256": "0a09e9160fba88eedaab85a66989e5727f5923f1cf35ba41402d509f9050fec0"
+  },
+  "feature_probe.json": {
+    "bytes": 6463,
+    "sha256": "40a5be7cfeed11d57993c6acb164791b2f853cfa6ea32044a63f27bc8f34f8ef"
+  },
+  "final/core_frozen_seed20.json": {
+    "bytes": 179487,
+    "sha256": "175e8d2b9882d6e21c23ab1ee32e3b91143fa66acef6a54790ceb0231ea6710b"
+  },
+  "final/core_frozen_seed21.json": {
+    "bytes": 179461,
+    "sha256": "76f1987a3d676a8028a033da1b7a1ced13f6ce71274f4bb56fa63b144db8b104"
+  },
+  "final/core_learned_seed20.json": {
+    "bytes": 179502,
+    "sha256": "acd76cc30ca1b2d299db986696835a6a77edae4fdc5568d156e6c19ad01f0106"
+  },
+  "final/core_learned_seed21.json": {
+    "bytes": 179427,
+    "sha256": "9b81d62d2c8f9599c8e12116efafbce40386747e4ac67075548c9527118e4c96"
+  },
+  "final/full.json": {
+    "bytes": 179442,
+    "sha256": "12ffcd53c7488c0d2e20156f66eddab6a08af41223e90afd99463cec9a33e814"
+  },
+  "final/plan.json": {
+    "bytes": 1220,
+    "sha256": "e6e0f84bbcd2d4e29bbce361fee125dd31d876e3684a97cc78b19b6d8510395f"
+  },
+  "final/summary.json": {
+    "bytes": 29977,
+    "sha256": "ee9bb5259a1cb26d3309fbf1c84849d458073c2896543ce7ed8c1b86b524fec3"
+  },
+  "final/tied_frozen.json": {
+    "bytes": 179453,
+    "sha256": "cde0a9945c599cdfc3586040a87d7875c34c68221c3b43bc0650ddfa98ae083a"
+  },
+  "full/energy.jsonl": {
+    "bytes": 467184,
+    "sha256": "752bc005533f6e15bea8b780a6cf781eb15d982272bb8e637e29520aa4d90b20"
+  },
+  "full/energy.protocol.json": {
+    "bytes": 2479616,
+    "sha256": "9302b3c1447c17c6e9cfc859510a3c374d0764e5ed9a45436c0d8544ef8bbac0"
+  },
+  "full/energy.pt": {
+    "bytes": 89607364,
+    "sha256": "6cc5f1723698acbd9eedcaa2eb7a1c7a429a9e0ce5482f6a71ee506547d379b0"
+  },
+  "full/source/config.py": {
+    "bytes": 8799,
+    "sha256": "6933822faa211e4d1dd0be6b002844006adef70dcda6e96152a2543218d4a008"
+  },
+  "full/source/openorca.py": {
+    "bytes": 6508,
+    "sha256": "f9e39f5dd679d252c01a11e22f1d818c195b708b56381159d27fe30533a37ed4"
+  },
+  "full/source/predictive_energy.py": {
+    "bytes": 10753,
+    "sha256": "1cc850c75030d6e8407cc113c6108b64e605f80a9141abaf51c9f80be034e4fa"
+  },
+  "full/source/protocol.py": {
+    "bytes": 3350,
+    "sha256": "dc25cc0643bc4390402b9408ef254aa0071ce335ee84a82267b388949399ec7b"
+  },
+  "full/source/rrem_repaired.py": {
+    "bytes": 56946,
+    "sha256": "4c85229219a50c9c97a57433b56e924729bca031ab03a17006f800f234d16177"
+  },
+  "full/source_optimized/config.py": {
+    "bytes": 8799,
+    "sha256": "6933822faa211e4d1dd0be6b002844006adef70dcda6e96152a2543218d4a008"
+  },
+  "full/source_optimized/openorca.py": {
+    "bytes": 6508,
+    "sha256": "f9e39f5dd679d252c01a11e22f1d818c195b708b56381159d27fe30533a37ed4"
+  },
+  "full/source_optimized/predictive_energy.py": {
+    "bytes": 13773,
+    "sha256": "7e67826fce6a24f1c6685c3010666f1c32f1c1e0ed678bb3c2db53ef935718ab"
+  },
+  "full/source_optimized/protocol.py": {
+    "bytes": 3350,
+    "sha256": "dc25cc0643bc4390402b9408ef254aa0071ce335ee84a82267b388949399ec7b"
+  },
+  "full/source_optimized/rrem_repaired.py": {
+    "bytes": 58125,
+    "sha256": "8580c1a9a670c3e92fa72049e8e4bec0121a99d43ce961f5b2153d0fac384f63"
+  },
+  "pair256/energy.pt": {
+    "bytes": 86624461,
+    "sha256": "fced54900934429c02aa92fac3ea621c7871e7ae4d5d7bccfb3cf1626bdafb27"
+  },
+  "pair256/frozen.pt": {
+    "bytes": 48874781,
+    "sha256": "40fe6d8b00c1434f7332c97cd9e1c077a1e05c2069956973e46a8c8598ebf80e"
+  },
+  "pair256/metrics.jsonl": {
+    "bytes": 179526,
+    "sha256": "a93f9bd32f0338f392bfcd16b77d9a5b8d54088e110bb8bef45322856ed54a9a"
+  },
+  "pair256/protocol.json": {
+    "bytes": 1099072,
+    "sha256": "d1090076332e84cee28c0e660b479bea9502a2d80a26d1c72945cc7689ce8716"
+  },
+  "pair256/source/__pycache__/predictive_energy.cpython-312.pyc": {
+    "bytes": 17639,
+    "sha256": "ef84b05fc281e87e01abf32cf462eaa6ea887809cdc228b55095cb4d0e2a052d"
+  },
+  "pair256/source/compare_predictive_energy.py": {
+    "bytes": 3815,
+    "sha256": "95ceebe20aee2e998aeda6a5dd5b58d076a20c06e980e78d941740493db0e6ce"
+  },
+  "pair256/source/config.py": {
+    "bytes": 8799,
+    "sha256": "6933822faa211e4d1dd0be6b002844006adef70dcda6e96152a2543218d4a008"
+  },
+  "pair256/source/openorca.py": {
+    "bytes": 6508,
+    "sha256": "f9e39f5dd679d252c01a11e22f1d818c195b708b56381159d27fe30533a37ed4"
+  },
+  "pair256/source/predictive_energy.py": {
+    "bytes": 10753,
+    "sha256": "1cc850c75030d6e8407cc113c6108b64e605f80a9141abaf51c9f80be034e4fa"
+  },
+  "pair256/source/rrem_repaired.py": {
+    "bytes": 62725,
+    "sha256": "6bc893f59a274b0bb53273b5c0c353fd615890d9364ee8a6ebc525b201e8a828"
+  },
+  "pair256_seed21/energy.pt": {
+    "bytes": 86624461,
+    "sha256": "feb3c1f8d550cd30e119b134f4c72b171c37663bdba40c5edfe30e7363b0d509"
+  },
+  "pair256_seed21/frozen.pt": {
+    "bytes": 48874781,
+    "sha256": "66273c388ef2db9ecf148abc29886e806a609d9c191661fb8cfb38ca83c37c73"
+  },
+  "pair256_seed21/metrics.jsonl": {
+    "bytes": 195151,
+    "sha256": "c21d51eee8e8a3a813fd490855b2cde050dbe2e0b54898ee08fac71fd7904cae"
+  },
+  "pair256_seed21/protocol.json": {
+    "bytes": 1099072,
+    "sha256": "24a885657821eeb41b1f42a42bc5f46c40acba829dfbf31e62e16d5383705155"
+  },
+  "pair256_seed21/source/compare_predictive_energy.py": {
+    "bytes": 3815,
+    "sha256": "95ceebe20aee2e998aeda6a5dd5b58d076a20c06e980e78d941740493db0e6ce"
+  },
+  "pair256_seed21/source/config.py": {
+    "bytes": 8799,
+    "sha256": "6933822faa211e4d1dd0be6b002844006adef70dcda6e96152a2543218d4a008"
+  },
+  "pair256_seed21/source/openorca.py": {
+    "bytes": 6508,
+    "sha256": "f9e39f5dd679d252c01a11e22f1d818c195b708b56381159d27fe30533a37ed4"
+  },
+  "pair256_seed21/source/predictive_energy.py": {
+    "bytes": 10753,
+    "sha256": "1cc850c75030d6e8407cc113c6108b64e605f80a9141abaf51c9f80be034e4fa"
+  },
+  "pair256_seed21/source/protocol.py": {
+    "bytes": 3350,
+    "sha256": "dc25cc0643bc4390402b9408ef254aa0071ce335ee84a82267b388949399ec7b"
+  },
+  "pair256_seed21/source/rrem_repaired.py": {
+    "bytes": 56946,
+    "sha256": "4c85229219a50c9c97a57433b56e924729bca031ab03a17006f800f234d16177"
+  },
+  "results.png": {
+    "bytes": 277433,
+    "sha256": "9dbd34abe4b4b633c9de9c510b376e6fd97bfdcd4ce48c37ba9984da131f55cc"
+  },
+  "results.svg": {
+    "bytes": 138036,
+    "sha256": "396b690af1e62beb5de5dbc8b12d3780cb95f51b7d64df2d2af7901204ab2350"
+  },
+  "tied_frozen/control.jsonl": {
+    "bytes": 221303,
+    "sha256": "b33c014334a5efc850af992c039e9ccfe6a8f5b9a6d982c6c912c57c4cd0df94"
+  },
+  "tied_frozen/control.protocol.json": {
+    "bytes": 2479616,
+    "sha256": "9302b3c1447c17c6e9cfc859510a3c374d0764e5ed9a45436c0d8544ef8bbac0"
+  },
+  "tied_frozen/control.pt": {
+    "bytes": 27385781,
+    "sha256": "93b399b35bb5a3b5be8ed176aec873aedf52e6c19270cd6ce412ba548c0fc0c0"
+  },
+  "tied_frozen/source/config.py": {
+    "bytes": 8799,
+    "sha256": "6933822faa211e4d1dd0be6b002844006adef70dcda6e96152a2543218d4a008"
+  },
+  "tied_frozen/source/openorca.py": {
+    "bytes": 6508,
+    "sha256": "f9e39f5dd679d252c01a11e22f1d818c195b708b56381159d27fe30533a37ed4"
+  },
+  "tied_frozen/source/predictive_energy.py": {
+    "bytes": 13773,
+    "sha256": "7e67826fce6a24f1c6685c3010666f1c32f1c1e0ed678bb3c2db53ef935718ab"
+  },
+  "tied_frozen/source/protocol.py": {
+    "bytes": 3350,
+    "sha256": "dc25cc0643bc4390402b9408ef254aa0071ce335ee84a82267b388949399ec7b"
+  },
+  "tied_frozen/source/rrem_repaired.py": {
+    "bytes": 58125,
+    "sha256": "8580c1a9a670c3e92fa72049e8e4bec0121a99d43ce961f5b2153d0fac384f63"
+  },
+  "verification/cli_resume.txt": {
+    "bytes": 191,
+    "sha256": "e10d35cda719d1e1a774adb6f2658ce3c35bd134cb0418d3d358e28f9ac9136b"
+  },
+  "verification/resume_mismatch_rejected.txt": {
+    "bytes": 802,
+    "sha256": "5384fc2b2e5afa24fa9f2209fc6abb064adc101cea470be595764777a997711d"
+  },
+  "verification/source_hashes.json": {
+    "bytes": 589,
+    "sha256": "bc277e80bc7eda05376447c88307b58223b9a5a7561a2c31ebdf2535eb4fdff6"
+  },
+  "verification/tests_all.txt": {
+    "bytes": 4091,
+    "sha256": "3e5a73ac965f0bfea2c66388b92ab4a39e064e679b8253c107511aa68dd862e5"
+  }
+}

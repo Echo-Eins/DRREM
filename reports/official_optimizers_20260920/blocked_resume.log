@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/echoens/Coding/Python/DRREM/scripts/compare_energy_optimizers.py", line 123, in <module>
+    main()
+  File "/home/echoens/Coding/Python/DRREM/scripts/compare_energy_optimizers.py", line 71, in main
+    raise ValueError('cannot train after final test')
+ValueError: cannot train after final test

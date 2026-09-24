@@ -1,0 +1,2 @@
+CPU float32: continuous 2 batches == 1 batch + saved checkpoint + resumed batch; all parameters, Adam state, counters and data protocol equal exactly.
+Changed prompt truncation was rejected.

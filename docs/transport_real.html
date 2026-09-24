@@ -1,0 +1,27 @@
+<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DRREM · реальные checkpoint</title>
+<style>:root{color-scheme:dark;font:16px/1.65 system-ui;background:#0b1420;color:#e2edf7}body{max-width:940px;margin:35px auto;padding:0 22px}h1{font-size:27px}h2{font-size:19px}a{color:#61ddcc}table{border-collapse:collapse;width:100%}td,th{text-align:left;padding:12px;border-bottom:1px solid #294054}small{color:#a2b6ca}pre{padding:18px;background:#142538;overflow:auto;font-size:12px}code{font-family:monospace}.note{border-left:3px solid #d3a674;padding:10px 17px;background:#1c2230}</style>
+<h1>Реальная машина: веса → forward → показания</h1>
+<p>Здесь полный размер <b>1024 × 3</b>, без усреднения до 128. Во всех записях один и тот же префикс <code>Nim=417; Nim=</code>, BOS в начале документа. Веса и исходники взяты из зафиксированных checkpoint; обучение не запускается.</p>
+<table><thead><tr><th>Машина</th><th>Бюджет FineWeb</th><th>Просмотр</th></tr></thead><tbody>
+<tr><td>Один путь · самостоятельные MLP-узлы</td><td>3 МБ</td><td><a href="../runs/real_views_20260924/packet1_3mb.html">Открыть 3D</a></td></tr>
+<tr><td>Один путь · самостоятельные MLP-узлы</td><td>10 МБ</td><td><a href="../runs/real_views_20260924/packet1_10mb.html">Открыть 3D</a></td></tr>
+<tr><td>Четыре пути + сборщик</td><td>3 МБ</td><td><a href="../runs/real_views_20260924/packet4_3mb.html">Открыть 3D</a></td></tr>
+<tr><td>Плотная база, с нуля</td><td>10 МБ</td><td><a href="../runs/real_views_20260924/fresh_base_10mb.html">Открыть 3D</a></td></tr>
+<tr><td>Плотная + перемычки, с нуля</td><td>10 МБ</td><td><a href="../runs/real_views_20260924/fresh_bridge_10mb.html">Открыть 3D</a></td></tr>
+<tr><td>Плотная + Fourier KAN + перемычки, с нуля</td><td>10 МБ</td><td><a href="../runs/real_views_20260924/fresh_fourier_bridge_10mb.html">Открыть 3D</a></td></tr>
+</tbody></table>
+<p><small>Файлы полностью автономны. Плотные модели занимают около 67 МБ, KAN — около 145 МБ: включены реальные синаптические веса, чтобы считать ток любого выбранного узла. Они лежат на SSD, ссылки в runs указывают туда.</small></p>
+<h2>Как читать</h2>
+<p>Выберите байт, хоп и узел (клик или номер). В плотной машине справа точное разложение изменения координаты: внутрислойные/межслойные связи, внимание, MLP, перемычки. Можно посмотреть входящие и исходящие токи; линии отфильтрованы для читаемости, само вычисление остаётся полным. В пакетной машине показываются реальные выбранные узлы, переходы, вероятности маршрутов, содержимое пакета, вклад MLP и веса сборщика.</p>
+<p>В разделе чтения прошлого доступны головы внимания, в декодере — h1…h8 и разложение логитов на прямой выход и причинную ridge-коррекцию. Чекпойнт, его SHA256, бюджет, настройки и ошибки численной проверки находятся слева. Кнопки сохраняют PNG и аудит.</p>
+<div class="note"><b>Границы показаний.</b> Это реальный CPU FP32-проход с обученными весами; не сохранённые активации исторического CUDA BF16-шага. Шкала яркости фиксирована внутри каждого файла по всем байтам и хопам, но между файлами сравнивайте числа. Большая активация или ток не доказывают полезности для ответа.</div>
+<p>У этих моделей нет спайков, мембран и осцилляторной фазы узла. В KAN можно увидеть реальное <code>ω·x</code> на связи; RoPE даёт позиционные углы Q/K. Эти два механизма не равны биологическому фазовому кодированию. Отрицательные результаты отдельных прошлых опытов не доказывают бесполезность всех фазовых или спайковых моделей.</p>
+<h2>Другой текст или checkpoint</h2>
+<pre>/home/echoens/Coding/Python/CERBER/.venv/bin/python -m scripts.build_transport_view \
+  --checkpoint /mnt/SSD/DRREM_runs/packet_routes_20260924/full_comparison/packet1/checkpoint_10mb.pt \
+  --source-root /mnt/SSD/DRREM_runs/packet_routes_20260924/full_comparison/source_v3 \
+  --text 'Nim=417; Nim=' --route-seed 0 \
+  --out /mnt/SSD/DRREM_runs/my_actual_trace.html</pre>
+<p><small>Команда выполняется из корня DRREM. Вместо --text можно указать --text-file. Принимается 1–127 байтов префикса, без скрытого обрезания. Каждый просмотр — одна записанная трасса; загрузка PyTorch-весов и новый forward выполняются Python-скриптом, не браузером. Сейчас поддержаны пакетная машина и варианты full_signal; неподдержанный тип отклоняется.</small></p>
+<p><a href="../runs/real_views_20260924/browser_checks.json">Проверки браузера</a> · <a href="transport_3d.html">Прежняя демонстрация 128 (случайные веса)</a></p>
+</html>

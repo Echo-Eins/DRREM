@@ -1,0 +1,204 @@
+{
+  "tests": "85/85 passed",
+  "pilots": {
+    "pilot128": {
+      "evaluations": [
+        {
+          "step": 0,
+          "h1_bpb": 4.644038805340949,
+          "mean8_bpb": 4.609987902453954
+        },
+        {
+          "step": 40,
+          "h1_bpb": 4.597464823664826,
+          "mean8_bpb": 4.555624615777118
+        },
+        {
+          "step": 80,
+          "h1_bpb": 4.634019154903895,
+          "mean8_bpb": 4.56511831026742
+        },
+        {
+          "step": 120,
+          "h1_bpb": 4.5751561055367995,
+          "mean8_bpb": 4.554285996298612
+        }
+      ],
+      "response_bytes": 112031,
+      "dev_documents": 32,
+      "input_to_head_ratio_median": 0.10440745577216148,
+      "input_head_cosine_median": -0.0017579817213118076
+    },
+    "frozen128": {
+      "evaluations": [
+        {
+          "step": 0,
+          "h1_bpb": 4.644038805340949,
+          "mean8_bpb": 4.609987902453954
+        },
+        {
+          "step": 40,
+          "h1_bpb": 4.617766380754199,
+          "mean8_bpb": 4.55687343450593
+        },
+        {
+          "step": 80,
+          "h1_bpb": 4.6122823385373675,
+          "mean8_bpb": 4.558454788494774
+        },
+        {
+          "step": 120,
+          "h1_bpb": 4.618089105922045,
+          "mean8_bpb": 4.563077490910252
+        }
+      ],
+      "response_bytes": 112031,
+      "dev_documents": 32,
+      "input_to_head_ratio_median": 0.110147625207901,
+      "input_head_cosine_median": 0.002011573873460293
+    },
+    "transpose128": {
+      "evaluations": [
+        {
+          "step": 0,
+          "h1_bpb": 4.644038805340949,
+          "mean8_bpb": 4.609987902453954
+        },
+        {
+          "step": 40,
+          "h1_bpb": 4.596746717018633,
+          "mean8_bpb": 4.554000211073488
+        },
+        {
+          "step": 80,
+          "h1_bpb": 4.544265120870561,
+          "mean8_bpb": 4.545359376308073
+        },
+        {
+          "step": 120,
+          "h1_bpb": 4.5855915051381855,
+          "mean8_bpb": 4.561116162816479
+        }
+      ],
+      "response_bytes": 112031,
+      "dev_documents": 32,
+      "input_to_head_ratio_median": 0.0975765772163868,
+      "input_head_cosine_median": -0.00669959862716496
+    }
+  },
+  "benchmarks": {
+    "benchmark": [
+      {
+        "B": 4,
+        "step": 0,
+        "seconds": 11.607284308876842,
+        "bytes": 210,
+        "peak_bytes": 2809308160
+      },
+      {
+        "B": 4,
+        "step": 1,
+        "seconds": 11.254270780365914,
+        "bytes": 176,
+        "peak_bytes": 2827150336
+      },
+      {
+        "B": 16,
+        "step": 0,
+        "seconds": 11.81014892179519,
+        "bytes": 840,
+        "peak_bytes": 2821721600
+      },
+      {
+        "B": 16,
+        "step": 1,
+        "seconds": 11.687052618712187,
+        "bytes": 997,
+        "peak_bytes": 2839563776
+      }
+    ],
+    "benchmark_chunked": [
+      {
+        "B": 16,
+        "step": 0,
+        "seconds": 5.009340282063931,
+        "bytes": 840,
+        "peak_bytes": 2821721600
+      },
+      {
+        "B": 16,
+        "step": 1,
+        "seconds": 4.590572665911168,
+        "bytes": 997,
+        "peak_bytes": 2838515200
+      },
+      {
+        "B": 64,
+        "step": 0,
+        "seconds": 7.515597945079207,
+        "bytes": 3857,
+        "peak_bytes": 2872425984
+      },
+      {
+        "B": 64,
+        "step": 1,
+        "seconds": 7.341382575687021,
+        "bytes": 3683,
+        "peak_bytes": 2888171008
+      }
+    ]
+  },
+  "budget_smoke": {
+    "expected_bytes": 4097,
+    "observed_bytes": 4097,
+    "updates": 9,
+    "resume_exit_code": 0
+  },
+  "launch": {
+    "pid": 1545338,
+    "started_at_utc": "2026-09-20T11:18:02.200518+00:00",
+    "cwd": "/home/echoens/Coding/Python/DRREM",
+    "command": [
+      "/home/echoens/Coding/Python/CERBER/.venv/bin/python",
+      "-u",
+      "-m",
+      "scripts.train_spiking_stdp",
+      "--out",
+      "/home/echoens/Coding/Python/DRREM/reports/last_decoder_20260920/scale1024x3",
+      "--N",
+      "1024",
+      "--layers",
+      "3",
+      "--hops",
+      "8",
+      "--horizons",
+      "8",
+      "--mtp-weight",
+      "1",
+      "--response-bytes",
+      "10000000",
+      "--batch",
+      "64",
+      "--prompt",
+      "1024",
+      "--response",
+      "1024",
+      "--length-bucket",
+      "1024",
+      "--dev-docs",
+      "64",
+      "--eval-every",
+      "20",
+      "--checkpoint-every",
+      "5",
+      "--teacher-transport",
+      "recurrent",
+      "--integration",
+      "integrated",
+      "--final-test"
+    ],
+    "tests": "85/85 passed",
+    "budget_smoke_response_bytes": 4097,
+    "status": "launched, not yet completed"
+  }
+}

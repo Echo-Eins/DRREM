@@ -73,7 +73,7 @@ def test_delta_readout2_is_neg_grad():
     mask = torch.tensor([True, True, False, True, True, False, True])
     lm = torch.ones(B, 2, dtype=torch.bool)
     lm[1, 1] = False  # у образца 1 уровень 2 не тактируется
-    with m.instrumented() as (W, E_r, Xi, _, _, _):
+    with m.instrumented() as (W, E_r, Xi, _, _, _, _gd):
         C = m.loss_per_sample(s0, Y, V, lm)[mask].mean()
         grads = torch.autograd.grad(C, E_r)
     dE = P2.delta_readout2(m, s0, Y, V, mask, lm)
@@ -143,7 +143,7 @@ def test_eqprop_with_traces_when_converged():
     I = torch.randn(B, m.cfg.D, dtype=torch.float64, generator=g) * 0.6
     Y, V = _YV(B, 2, g)
     xbar = m.xbar(st)
-    with m.instrumented() as (W, _, _, _, _, _):
+    with m.instrumented() as (W, _, _, _, _, _, _gd):
         xf, _ = m.run_free(st.x, I, H, xbar, W)
         C = m.loss_per_sample(m.rho(xf), Y, V).mean()
         (G,) = torch.autograd.grad(C, [W])
@@ -175,7 +175,7 @@ def test_neuron_rules_c_and_adapt_match_autograd():
     st.x = torch.randn(B, m.cfg.D, dtype=torch.float64, generator=g) * 0.3
     I = torch.randn(B, m.cfg.D, dtype=torch.float64, generator=g) * 0.6
     Y, V = _YV(B, 2, g)
-    with m.instrumented() as (W, _, _, c, gad, _):
+    with m.instrumented() as (W, _, _, c, gad, _, _gd):
         xbar = torch.einsum("lmi,bmi->bli", c, st.traces)[:, 0]
         bias = -gad[None] * st.adapt
         xf, _ = m.run_free(st.x, I, H, xbar, W, bias=bias)
@@ -228,7 +228,7 @@ def test_flywheel_and_input_rules_match_autograd():
     xb = torch.randint(0, 256, (B, 1), generator=g)  # байты входа
     Y, V = _YV(B, 2, g)
     E_in = m.E_in.detach().clone().requires_grad_(True)
-    with m.instrumented() as (W, _, _, _, _, kap):
+    with m.instrumented() as (W, _, _, _, _, kap, _gd):
         bias = kap[None] * st.err
         I = E_in[xb[:, 0]]
         xf, _ = m.run_free(st.x, I, H, None, W, bias=bias)
@@ -282,7 +282,7 @@ def test_delay_lines_are_exact_and_c_rule_holds():
     st.x = torch.randn(B, m.cfg.D, dtype=torch.float64, generator=g) * 0.3
     I = torch.randn(B, m.cfg.D, dtype=torch.float64, generator=g) * 0.6
     Y, V = _YV(B, 1, g)
-    with m.instrumented() as (W, _, _, c, _, _):
+    with m.instrumented() as (W, _, _, c, _, _, _gd):
         xbar = torch.einsum("lmi,bmi->bli", c, st.traces)[:, 0]
         xf, _ = m.run_free(st.x, I, H, xbar, W)
         C = m.loss_per_sample(m.rho(xf), Y, V).mean()
@@ -337,7 +337,7 @@ def test_adjoint_nudge_restores_alignment_with_A():
         I = torch.randn(B, m.cfg.D, dtype=torch.float64, generator=g) * 0.6
         Y, V = _YV(B, 1, g)
         act = torch.ones(B, dtype=torch.bool)
-        with m.instrumented() as (W, _, _, _, _, _):
+        with m.instrumented() as (W, _, _, _, _, _, _gd):
             xf, _ = m.run_free(st.x, I, H, None, W)
             C = m.loss_per_sample(m.rho(xf), Y, V).mean()
             (G,) = torch.autograd.grad(C, [W])
@@ -379,3 +379,238 @@ def test_row_adam_preserves_structure_and_profile_projection():
         P2.project_c_profile(m, total)
     assert torch.allclose(m.S, m.S.T) and float((m.S * (1 - m.mask)).abs().max()) == 0.0
     assert torch.allclose(m.c.abs().sum(1), torch.full((m.c.shape[0], D), total, dtype=torch.float64))
+
+
+def test_trust_step_normalizes_relative_step_and_preserves_structure():
+    """Доверительный шаг приводит ‖Δp‖/max(‖p‖,‖p₀‖) к цели для названных групп — в том числе
+    поднимает отставшую на порядки группу, — не трогает остальные и сохраняет структуру S/A."""
+    m = _v2(L=3, horizons=((1,), (1,), (1,)), dam_M=4)
+    g = torch.Generator().manual_seed(5)
+    D = m.cfg.D
+    dS = torch.randn(D, D, generator=g, dtype=torch.float64)
+    dA = torch.randn(D, D, generator=g, dtype=torch.float64)
+    dXi = [torch.randn(x.shape, generator=g, dtype=torch.float64) * 1e-9 for x in m.Xi]  # сигнал на порядки меньше
+    S0, A0 = m.S.clone(), m.A.clone()
+    r = 1e-3
+    info = P2.apply_update2(m, dS, dA, None, dXi, lr_S=0.01, lr_A=0.01, lr_Xi=1.0,
+                            step_mode="trust", trust_ratio=r, trust_groups=("S", "Xi"))
+    ref_S = max(float(S0.norm()), m.base_norm["S"])
+    assert abs(float((m.S - S0).norm()) / ref_S - r) < 1e-9
+    ref_A = max(float(A0.norm()), m.base_norm["A"])  # A не в trust_groups — шаг по сигналу, а не к цели
+    assert abs(float((m.A - A0).norm()) / ref_A - r) > 10 * r
+    assert info["Xi0_ratio"] < 1e-6 and abs(info["Xi0_ratio"] * info["Xi0_trust_gain"] - r) < 1e-12
+    assert torch.allclose(m.S, m.S.T) and torch.allclose(m.A, -m.A.T)
+    assert float((m.S * (1 - m.mask)).abs().max()) == 0.0
+
+
+def test_readout_bias_rule_matches_gradient_and_nudge_excludes_bias():
+    """Свободный член чтения — всегда-активная единица: дельта-правило остаётся точным градиентом,
+    а подталкивание состояния его не касается (у постоянной единицы нет динамики)."""
+    m = _v2(horizons=((1, 2), (1, 4)), readout_bias=True)
+    N = m.cfg.N
+    assert m.N_r == N + 1 and all(e.shape[-1] == N + 1 for e in m.E_r)
+    g = torch.Generator().manual_seed(2)
+    B = 7
+    s0 = torch.rand(B, m.cfg.D, dtype=torch.float64, generator=g)
+    Y, V = _YV(B, 4, g)
+    mask = torch.ones(B, dtype=torch.bool)
+    lm = torch.ones(B, 2, dtype=torch.bool)
+    with m.instrumented() as (W, E_r, Xi, _, _, _, _gd):
+        C = m.loss_per_sample(s0, Y, V, lm)[mask].mean()
+        grads = torch.autograd.grad(C, E_r)
+    dE = P2.delta_readout2(m, s0, Y, V, mask, lm)
+    for l in range(2):
+        assert torch.allclose(dE[l], -grads[l], atol=1e-10), float((dE[l] + grads[l]).abs().max())
+        assert float(dE[l][:, :, N].abs().max()) > 0  # свободный член действительно учится
+    # сила подталкивания живёт только на настоящих единицах
+    f = m.nudge_force(s0, Y, V)
+    assert f.shape[1] == m.cfg.D
+
+
+def test_tied_readout_shares_code_with_input():
+    """tied E: вход — та же строка, что чтение уровня 1 горизонта 1, с отдельной амплитудой."""
+    m = _v2(L=1, horizons=((1,),), tie_readout=True, tie_norm=False)
+    x = torch.randint(0, 256, (5, 3))
+    I = m.input_drive(x, 1)
+    expect = m.tie_gain * m.E_r[0][0][x[:, 1]][:, : m.cfg.N]
+    assert torch.allclose(I[:, : m.cfg.N], expect)
+    before = I.clone()
+    m.E_r[0] += 0.1  # обучение чтения немедленно меняет вход — код общий
+    assert not torch.allclose(m.input_drive(x, 1), before)
+    # при tie_norm амплитуда входа постоянна, направление — то же
+    mn = _v2(L=1, horizons=((1,),), tie_readout=True, tie_norm=True)
+    In = mn.input_drive(x, 1)[:, : mn.cfg.N]
+    assert torch.allclose(In.norm(dim=1), torch.full((5,), mn.tie_row_norm, dtype=In.dtype), atol=1e-8)
+    mn.E_r[0] *= 7.0
+    assert torch.allclose(mn.input_drive(x, 1)[:, : mn.cfg.N], In, atol=1e-8)
+
+
+def test_c_sum_cap_from_init_has_no_shock():
+    """При c_sum_max_ratio предел берётся от начальной суммы, поэтому первое же обновление c
+    не режет громкость следов (прежний абсолютный предел 1,5 при начальных 2,0 резал на 25 %)."""
+    kw = dict(L=1, horizons=((1,),), trace_taus=(2.0, 8.0), delay_lags=(1, 2), trace_gain=0.5, delay_gain=0.5)
+    m_old = _v2(**kw)
+    m_new = _v2(**kw, c_sum_max_ratio=1.0)
+    assert abs(m_old.c_sum_cap - 1.5) < 1e-9 and abs(m_new.c_sum_cap - 2.0) < 1e-9
+    dc = torch.zeros_like(m_new.c)
+    for mm, shrunk in ((m_old, True), (m_new, False)):
+        before = float(mm.c.abs().sum(1).max())
+        P2.apply_update2(mm, dc=dc, lr_c=1.0, neuron_steps="sgd")
+        after = float(mm.c.abs().sum(1).max())
+        assert (after < before * 0.99) == shrunk, (before, after)
+
+
+def _check_dam_gain_rule(rho: str) -> None:
+    m = _v2(N=24, L=3, horizons=((1,), (1,), (1,)), dam_M=6, dam_beta=3.0, dam_gain=0.7,
+            gamma_in=0.0, alpha=0.2, g_S=0.4, g_r=2.0, rho=rho)
+    g = torch.Generator().manual_seed(21)
+    B, H, beta = 16, 800, 1e-4
+    x0 = torch.randn(B, m.cfg.D, dtype=torch.float64, generator=g) * 0.3
+    I = torch.randn(B, m.cfg.D, dtype=torch.float64, generator=g) * 0.6
+    Y, V = _YV(B, 1, g)
+    with m.instrumented() as (W, _, Xi, _, _, _, gd):
+        xf, _ = m.run_free(x0, I, H, None, W, Xi=Xi)
+        C = m.loss_per_sample(m.rho(xf), Y, V).mean()
+        (G,) = torch.autograd.grad(C, [gd])
+    xf = xf.detach()
+    xn, _ = m.run_nudged(xf, I, H, beta, Y, V)
+    dgd = P2.dam_gain_update(m, m.rho(xf), m.rho(xn), beta)
+    c = cos(dgd, -G)
+    assert c > 0.99, (rho, float(c), dgd.tolist(), (-G).tolist())
+
+
+def test_dam_gain_rule_matches_autograd_and_frees_amplitude():
+    """Усиление плотной памяти: правило из энергии совпадает с −∂C/∂g_d — и для поэлементной ρ,
+    и для вентиля; при dam_normalize='none' норма прототипа (а с ней и амплитуда тока) не заперта."""
+    for rho in ("hardsig", "gate"):
+        _check_dam_gain_rule(rho)
+    m = _v2(N=24, L=1, horizons=((1,),), dam_M=6, dam_beta=3.0, dam_gain=0.7, gamma_in=0.0, alpha=0.2, g_S=0.4, g_r=2.0)
+    # амплитуда: при "unit" норма прототипа всегда 1, при "none" — свободна до предела
+    m_free = _v2(N=24, L=1, horizons=((1,),), dam_M=6, dam_normalize="none", dam_norm_cap=10.0)
+    m_free.Xi[0] *= 4.0
+    m_free.normalize_prototypes()
+    assert float(m_free.Xi[0].norm(dim=1).max()) > 3.9
+    m_unit = _v2(N=24, L=1, horizons=((1,),), dam_M=6)
+    m_unit.Xi[0] *= 4.0
+    m_unit.normalize_prototypes()
+    assert abs(float(m_unit.Xi[0].norm(dim=1).max()) - 1.0) < 1e-9
+
+
+def _gate(**kw) -> MachineV2:
+    return _v2(**{"rho": "gate", "L": 1, "horizons": ((1,),), "gamma_in": 0.0, **kw})
+
+
+def test_gate_jacobian_matches_autograd():
+    """Jᵀv в замкнутой форме совпадает с vjp автограда для u = x ⊙ r(x)."""
+    m = _gate(N=12, L=2, horizons=((1,), (1,)))
+    g = torch.Generator().manual_seed(31)
+    x = torch.randn(4, m.cfg.D, dtype=torch.float64, generator=g).requires_grad_(True)
+    v = torch.randn(4, m.cfg.D, dtype=torch.float64, generator=g)
+    u = m.rho(x)
+    (jt,) = torch.autograd.grad(u, [x], grad_outputs=v)
+    ours = m.gate_jacobian_T(v, x.detach())
+    assert torch.allclose(ours, jt, atol=1e-10), float((ours - jt).abs().max())
+
+
+def test_gate_hop_is_exact_energy_descent_and_has_no_dead_zone():
+    """Хоп с вентилем — точный шаг спуска по энергии: (x − x_new)/α = ∂E/∂x. И r > 0 везде,
+    ‖r‖ = √N по уровню (RMS(r) = 1, среднее меньше): бюджет сообщения фиксирован, мёртвых единиц нет."""
+    m = _gate(N=10, L=2, horizons=((1,), (1,)), dam_M=4, dam_beta=2.0, dam_gain=0.5, alpha=0.3)
+    g = torch.Generator().manual_seed(32)
+    B = 5
+    x = torch.randn(B, m.cfg.D, dtype=torch.float64, generator=g) * 0.7
+    I = torch.randn(B, m.cfg.D, dtype=torch.float64, generator=g) * 0.4
+    xr = x.clone().requires_grad_(True)
+    E = m.energy(xr, I).sum()
+    (gE,) = torch.autograd.grad(E, [xr])
+    xn = m.hop(x, I)
+    assert torch.allclose((x - xn) / m.cfg.alpha, gE, atol=1e-9), float(((x - xn) / m.cfg.alpha - gE).abs().max())
+    _, _, _, r, _ = m.gate_parts(x)
+    assert float(r.min()) > 0.0  # мёртвой зоны нет: доступность строго положительна у всех единиц
+    import math as _m
+    per_level = r.view(B, m.cfg.L, m.cfg.N).norm(dim=2)
+    assert torch.allclose(per_level, torch.full_like(per_level, _m.sqrt(m.cfg.N)), atol=1e-8)
+    u = m.rho(x)
+    assert float(u.view(B, m.cfg.L, m.cfg.N).norm(dim=2).max()) <= _m.sqrt(m.cfg.N) + 1e-8
+
+
+def test_gate_keeps_eqprop_contrast_aligned_with_gradient():
+    """Главная проверка вентиля: контраст близнецовых фаз остаётся оценкой −∂C/∂S на сошедшейся сети."""
+    m = _gate(N=32, alpha=0.2, g_S=0.4, g_r=2.0)
+    g = torch.Generator().manual_seed(33)
+    B, H, beta = 16, 600, 1e-3
+    x0 = torch.randn(B, m.cfg.D, dtype=torch.float64, generator=g) * 0.3
+    I = torch.randn(B, m.cfg.D, dtype=torch.float64, generator=g) * 0.6
+    Y, V = _YV(B, 1, g)
+    with m.instrumented() as (W, _, _, _, _, _, _):
+        xf, _ = m.run_free(x0, I, H, None, W)
+        C = m.loss_per_sample(m.rho(xf), Y, V).mean()
+        (G,) = torch.autograd.grad(C, [W])
+    xf = xf.detach()
+    s0 = m.rho(xf)
+    xn, _ = m.run_nudged(xf, I, H, beta, Y, V)
+    dS = P2.contrast2(s0, m.rho(xn), beta)
+    gS = -tied_sym_grad(G)
+    c = cos(dS, gS)
+    assert c > 0.99, c
+    scale = float((dS * gS).sum() / (gS * gS).sum())
+    assert abs(scale - 1.0) < 0.1, scale
+
+
+def test_gate_produces_conjunctions_unlike_elementwise():
+    """Вентиль мультипликативен: отклик на два входа не равен сумме откликов на каждый в отдельности.
+    У поэлементной жёсткой сигмоиды в линейной области он равен ей точно — отсюда аддитивный потолок."""
+    def interaction(m):
+        g = torch.Generator().manual_seed(34)
+        D = m.cfg.D
+        Ia = torch.zeros(1, D, dtype=torch.float64)
+        Ib = torch.zeros(1, D, dtype=torch.float64)
+        Ia[0, : D // 2] = torch.randn(D // 2, generator=g, dtype=torch.float64) * 0.5
+        Ib[0, D // 2 :] = torch.randn(D - D // 2, generator=g, dtype=torch.float64) * 0.5
+        f = lambda I: m.rho(m.run_free(torch.zeros(1, D, dtype=torch.float64), I, 6)[0])
+        both, a, b, zero = f(Ia + Ib), f(Ia), f(Ib), f(torch.zeros(1, D, dtype=torch.float64))
+        return float((both - a - b + zero).norm() / both.norm().clamp_min(1e-12))
+    lin = _v2(N=24, L=1, horizons=((1,),), gamma_in=0.0, theta=-2.0)  # порог низкий: все единицы в линейной области
+    gate = _gate(N=24)
+    assert interaction(lin) < 1e-9, interaction(lin)
+    assert interaction(gate) > 0.05, interaction(gate)
+
+
+def test_tie_readout_needs_input_gradient_term():
+    """При tie_readout строка чтения служит и входом. Одно дельта-правило чтения — лишь частная
+    производная: с полным градиентом оно согласовано слабо. С членом через вход — точно."""
+    m = _v2(N=32, L=1, horizons=((1,),), tie_readout=True, gamma_in=0.0, alpha=0.2, g_S=0.4, g_r=2.0)
+    g = torch.Generator().manual_seed(41)
+    B, H, beta = 12, 800, 1e-4
+    xb = torch.randint(0, 256, (B, 3), generator=g)
+    x0 = torch.randn(B, m.cfg.D, dtype=torch.float64, generator=g) * 0.3
+    Y, V = _YV(B, 1, g)
+    with m.instrumented() as (W, E_r, *_):
+        I = m.input_drive(xb, 1)  # вход ВНУТРИ графа: он идёт через ту же строку чтения
+        xf, _ = m.run_free(x0, I, H, None, W)
+        C = m.loss_per_sample(m.rho(xf), Y, V).mean()
+        (G,) = torch.autograd.grad(C, [E_r[0]])
+    I = m.input_drive(xb, 1).detach()
+    xf, _ = m.run_free(x0, I, H)
+    s0 = m.rho(xf)
+    xn, _ = m.run_nudged(xf, I, H, beta, Y, V)
+    dE = P2.delta_readout2(m, s0, Y, V)[0]
+    tie = P2.tie_input_update(m, xb[:, 1], s0, m.rho(xn), beta)
+    c_part, c_full = cos(dE, -G), cos(dE + tie, -G)
+    assert c_part < 0.9, c_part
+    assert c_full > 0.999, (c_part, c_full)
+    assert abs(float(((dE + tie) * -G).sum() / (G * G).sum()) - 1.0) < 0.05
+
+
+def test_trust_max_gain_refuses_to_amplify_weak_signal():
+    """Предел усиления: доверительный шаг не поднимает заведомо слабый сигнал к цели."""
+    m = _v2(L=1, horizons=((1,),), dam_M=4)
+    g = torch.Generator().manual_seed(42)
+    dXi = [torch.randn(x.shape, generator=g, dtype=torch.float64) * 1e-9 for x in m.Xi]
+    before = m.Xi[0].clone()
+    info = P2.apply_update2(m, dXi=dXi, lr_Xi=1.0, step_mode="trust", trust_ratio=1e-3,
+                            trust_groups=("Xi",), trust_max_gain=10.0)
+    assert abs(info["Xi0_trust_gain"] - 10.0) < 1e-9
+    m2 = _v2(L=1, horizons=((1,),), dam_M=4)
+    info2 = P2.apply_update2(m2, dXi=dXi, lr_Xi=1.0, step_mode="trust", trust_ratio=1e-3, trust_groups=("Xi",))
+    assert info2["Xi0_trust_gain"] > 1e3  # без предела сигнал 1e-9 разгоняется на три порядка

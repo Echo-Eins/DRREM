@@ -1,0 +1,15 @@
+{
+  "step": 120,
+  "checkpoint_sha256": "978153f29cc33433ef6e4f9a6237cc44c9d810ee53df3fbf5a62af8ed71fdd60",
+  "optimization": {
+    "rule": "global",
+    "optimizer": "adam",
+    "scope": "global",
+    "core_lr": 0.0001,
+    "head_lr": 0.003,
+    "router_lr": 0.001,
+    "residual": 0.1,
+    "momentum": 0.95,
+    "ns_steps": 5
+  }
+}

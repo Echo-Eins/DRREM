@@ -3,6 +3,20 @@ data/raw/
 data/*.parquet
 __pycache__/
 *.pyc
+# Model weights, optimizer states, and serialized activation dumps stay local.
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+# Generated viewer embeds parameter tensors; keep its source and builder only.
+/docs/transport_3d.html
+/reports/**/pid
 runs/
 .idea/
 data/tokenizer_qwen2.5/
+/reports/predictive_energy_20260920/**/*.pt
+/reports/official_optimizers_20260920/**/*.pt
+/reports/event_stdp_20260923/**/*.pt
+
+/reports/last_decoder_20260920/**/*.pt

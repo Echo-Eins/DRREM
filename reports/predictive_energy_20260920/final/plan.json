@@ -1,0 +1,36 @@
+{
+  "selected_before_test": "full",
+  "full_steps": 360,
+  "core_comparison_steps": 120,
+  "checkpoints": {
+    "core_frozen_seed20": {
+      "path": "pair256/frozen.pt",
+      "sha256": "40fe6d8b00c1434f7332c97cd9e1c077a1e05c2069956973e46a8c8598ebf80e"
+    },
+    "core_learned_seed20": {
+      "path": "pair256/energy.pt",
+      "sha256": "fced54900934429c02aa92fac3ea621c7871e7ae4d5d7bccfb3cf1626bdafb27"
+    },
+    "core_frozen_seed21": {
+      "path": "pair256_seed21/frozen.pt",
+      "sha256": "66273c388ef2db9ecf148abc29886e806a609d9c191661fb8cfb38ca83c37c73"
+    },
+    "core_learned_seed21": {
+      "path": "pair256_seed21/energy.pt",
+      "sha256": "feb3c1f8d550cd30e119b134f4c72b171c37663bdba40c5edfe30e7363b0d509"
+    },
+    "tied_frozen": {
+      "path": "tied_frozen/control.pt",
+      "sha256": "93b399b35bb5a3b5be8ed176aec873aedf52e6c19270cd6ce412ba548c0fc0c0"
+    },
+    "full": {
+      "path": "full/energy.pt",
+      "sha256": "6cc5f1723698acbd9eedcaa2eb7a1c7a429a9e0ce5482f6a71ee506547d379b0"
+    }
+  },
+  "test_split_seed": 20260920,
+  "test_docs": 256,
+  "prompt_max": 64,
+  "resp_max": 64,
+  "interpretation": "reserved for this new initialization series; no claim about every historical run"
+}

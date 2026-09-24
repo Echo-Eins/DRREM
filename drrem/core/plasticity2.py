@@ -77,8 +77,33 @@ def delta_readout2(machine, s0, Y, V, m=None, level_mask=None) -> list[torch.Ten
         if level_mask is not None:
             w = w * level_mask[:, l].float()[:, None]
         err = (yoh - p) * w[:, :, None]
-        s_l = s0.view(B, L, N)[:, l]
+        s_l = machine.readout_state(s0, l)  # со свободным членом, если он включён
         out.append(torch.einsum("bhv,bn->hvn", err, s_l) * (machine.level_w[l] / (n * machine.cfg.tau_r)))
+    return out
+
+
+def tie_input_update(machine, x_bytes_t, s_neg, sb, beta: float, m=None) -> torch.Tensor:
+    """Второй путь градиента при tie_readout. Строка чтения байта служит ещё и входом, поэтому полный
+    −∂C/∂E_r[0][0] содержит член через вход: энергия содержит −sᵀI ⇒ −∂C/∂I ≈ d₁/β, а I = g·row/‖row‖.
+    Без него дельта-правило чтения — лишь частная производная: измерено cos 0,61–0,68 с полным
+    градиентом и наклон 0,37–0,47, то есть теряется больше половины. С ним cos = 1,000000.
+    Возвращает добавку формы E_r[0], ненулевую только в [горизонт 0, байт, :N]."""
+    N = machine.cfg.N
+    d1 = (sb - s_neg)[:, :N] / beta
+    if m is not None:
+        d1, x_bytes_t = d1[m], x_bytes_t[m]
+    n = max(d1.shape[0], 1)
+    rows = machine.E_r[0][0][x_bytes_t][:, :N]
+    if machine.cfg.tie_norm:
+        nrm = rows.norm(dim=1, keepdim=True).clamp_min(1e-8)
+        rhat = rows / nrm
+        contrib = (machine.tie_row_norm / nrm) * (d1 - (d1 * rhat).sum(1, keepdim=True) * rhat)
+    else:
+        contrib = machine.tie_gain * d1
+    buf = torch.zeros(256, N, device=d1.device, dtype=d1.dtype)
+    buf.index_add_(0, x_bytes_t, contrib / n)
+    out = torch.zeros_like(machine.E_r[0])
+    out[0, :, :N] = buf
     return out
 
 
@@ -95,7 +120,30 @@ def dam_contrast(machine, s0, sb, beta: float, m=None) -> list[torch.Tensor]:
         a0l, abl = a0[l], ab[l]
         if m is not None:
             s0l, sbl, a0l, abl = s0l[m], sbl[m], a0l[m], abl[m]
-        out.append((abl.T @ sbl - a0l.T @ s0l) * (machine.cfg.dam_gain / (n * beta)))
+        out.append((abl.T @ sbl - a0l.T @ s0l) * (float(machine.dam_g[l]) / (n * beta)))
+    return out
+
+
+def dam_gain_update(machine, s_neg, sb, beta: float, m=None) -> torch.Tensor:
+    """Усиление плотной памяти по уровням: энергия содержит −(g_l/β_d)·logsumexp(β_d Ξ_l s_l),
+    значит ∂E/∂g_l = −lse_l/β_d и −∂C/∂g_l ≈ (1/β)[lse_l(s^β) − lse_l(s^neg)]/β_d.
+    Смысл: память делает себя громче ровно тогда, когда движение к истине усиливает совпадение
+    состояния с хранимыми прототипами. Скаляр на уровень, вычислим из активности самого уровня. (L,)"""
+    if not machine.Xi:
+        return torch.zeros(0, device=s_neg.device)
+    B, N, L = s_neg.shape[0], machine.cfg.N, machine.cfg.L
+    bd = machine.cfg.dam_beta
+    out = torch.zeros(L, device=s_neg.device, dtype=s_neg.dtype)
+    for l in range(L):
+        a = s_neg.view(B, L, N)[:, l]
+        b = sb.view(B, L, N)[:, l]
+        if m is not None:
+            a, b = a[m], b[m]
+        if a.shape[0] == 0:
+            continue
+        lse_n = torch.logsumexp(bd * (a @ machine.Xi[l].T), dim=-1)
+        lse_b = torch.logsumexp(bd * (b @ machine.Xi[l].T), dim=-1)
+        out[l] = (lse_b - lse_n).mean() / (beta * bd)
     return out
 
 
@@ -149,28 +197,46 @@ def input_embed_update(machine, x_bytes_t, s_neg, sb, beta: float, m=None) -> to
 @torch.no_grad()
 def apply_update2(machine, dS=None, dA=None, dE=None, dXi=None, lr_S=0.0, lr_A=0.0, lr_E=0.0, lr_Xi=0.0,
                   decay_S=0.0, decay_A=0.0, decay_E=0.0, max_ratio=0.05, dc=None, dg=None, lr_c=0.0, lr_g=0.0,
-                  dk=None, lr_k=0.0, dEin=None, lr_Ein=0.0, neuron_steps: str = "normalized") -> dict:
+                  dk=None, lr_k=0.0, dEin=None, lr_Ein=0.0, dgd=None, lr_gd=0.0, neuron_steps: str = "normalized",
+                  step_mode: str = "clip", trust_ratio: float = 0.0, trust_groups: tuple = (),
+                  trust_max_gain: float = 0.0) -> dict:
+    """step_mode="trust": для групп из trust_groups норма шага приводится К trust_ratio·max(‖p‖,‖p₀‖)
+    (направление правила сохраняется, меняется только масштаб — обусловленность по группам).
+    step_mode="clip": прежнее поведение, относительный шаг только обрезается сверху max_ratio."""
     out = {}
     bn = machine.base_norm
+    trust = step_mode == "trust" and trust_ratio > 0
+
+    def _trust(step, ratio, group, key):
+        """Масштабирование шага к цели; сырое ratio остаётся в логе как диагностика обусловленности."""
+        if trust and group in trust_groups and ratio > 1e-30:
+            target = min(trust_ratio, max_ratio)  # цель не может обойти защиту от разгона
+            gain = target / ratio
+            if trust_max_gain > 0:
+                gain = min(gain, trust_max_gain)  # слабый сигнал не поднимаем: это было бы блуждание
+            out[f"{key}_trust_gain"] = gain
+            return step * gain, False
+        if ratio > max_ratio:
+            return step * (max_ratio / ratio), True
+        return step, False
     if neuron_steps == "sgd":
         # обычные шаги, пропорциональные сигналу; ограничение относительного шага как у весов
-        def _plain(param, d, lr, key, lo=None, hi=None):
+        def _plain(param, d, lr, key, lo=None, hi=None, group=None):
             step = lr * d
             ratio = float(step.norm() / param.norm().clamp_min(1e-12))
-            if ratio > max_ratio:
-                step = step * (max_ratio / ratio)
+            step, _ = _trust(step, ratio, group, key)
             param += step
             if lo is not None or hi is not None:
                 param.clamp_(lo, hi)
             out[f"{key}_step"] = ratio
         if dk is not None and lr_k > 0 and machine.kappa is not None:
-            _plain(machine.kappa, dk, lr_k, "kappa", 0.0, machine.cfg.kappa_max)
+            _plain(machine.kappa, dk, lr_k, "kappa", 0.0, machine.cfg.kappa_max, "k")
         if dc is not None and lr_c > 0 and machine.c is not None:
-            _plain(machine.c, dc, lr_c, "c", -machine.cfg.c_max, machine.cfg.c_max)
+            _plain(machine.c, dc, lr_c, "c", -machine.cfg.c_max, machine.cfg.c_max, "c")
             tot = machine.c.abs().sum(1, keepdim=True)
-            machine.c *= torch.where(tot > machine.cfg.c_sum_max, machine.cfg.c_sum_max / tot, torch.ones_like(tot))
+            machine.c *= torch.where(tot > machine.c_sum_cap, machine.c_sum_cap / tot, torch.ones_like(tot))
         if dg is not None and lr_g > 0 and machine.g_adapt is not None:
-            _plain(machine.g_adapt, dg, lr_g, "g", 0.0, None)
+            _plain(machine.g_adapt, dg, lr_g, "g", 0.0, None, "g")
         dc = dg = dk = None  # ниже — только нормированный вариант
     # по-нейронные свойства: нормированный относительный шаг от max(‖p‖, ‖p₀‖) (lr — доля нормы за обновление);
     # их градиент на два порядка меньше градиента весов, а направление батчевого правила надёжно (P1: cos 0,996);
@@ -180,16 +246,25 @@ def apply_update2(machine, dS=None, dA=None, dE=None, dXi=None, lr_S=0.0, lr_A=0
         machine.kappa += step
         machine.kappa.clamp_(0.0, machine.cfg.kappa_max)
         out["kappa_step"] = float(step.norm() / machine.kappa.norm().clamp_min(1e-12))
+    if dgd is not None and lr_gd > 0 and machine.Xi:
+        step = lr_gd * dgd
+        ratio = float(step.norm() / machine.dam_g.norm().clamp_min(1e-12))
+        step, _ = _trust(step, ratio, "gd", "gd")
+        machine.dam_g += step
+        machine.dam_g.clamp_(min=0.0)
+        out["gd_ratio"] = ratio
     if dEin is not None and lr_Ein > 0:
         step = lr_Ein * dEin
+        ratio = float(step.norm() / machine.E_in.norm().clamp_min(1e-12))
+        step, _ = _trust(step, ratio, "Ein", "Ein")
         machine.E_in += step
-        out["Ein_ratio"] = float(step.norm() / machine.E_in.norm().clamp_min(1e-12))
+        out["Ein_ratio"] = ratio
     if dc is not None and lr_c > 0 and machine.c is not None:
         step = lr_c * max(float(machine.c.norm()), bn["c"]) * dc / dc.norm().clamp_min(1e-12)
         machine.c += step
         machine.c.clamp_(-machine.cfg.c_max, machine.cfg.c_max)  # отрицательные смеси разрешены (разностные фильтры)
         tot = machine.c.abs().sum(1, keepdim=True)  # Σ_m |c_im| ≤ c_sum_max — ограничение усиления медленного контура
-        machine.c *= torch.where(tot > machine.cfg.c_sum_max, machine.cfg.c_sum_max / tot, torch.ones_like(tot))
+        machine.c *= torch.where(tot > machine.c_sum_cap, machine.c_sum_cap / tot, torch.ones_like(tot))
         out["c_step"] = float(step.norm() / machine.c.norm().clamp_min(1e-12))
     if dg is not None and lr_g > 0 and machine.g_adapt is not None:
         step = lr_g * max(float(machine.g_adapt.norm()), bn["g"]) * dg / dg.norm().clamp_min(1e-12)
@@ -204,26 +279,24 @@ def apply_update2(machine, dS=None, dA=None, dE=None, dXi=None, lr_S=0.0, lr_A=0
         for e in machine.E_r:
             e *= 1.0 - decay_E
 
-    def _step(param, step, key, base):
-        ref = max(float(param.norm()), base)  # ограничение от max(‖p‖, ‖p₀‖)
+    def _step(param, step, key, base, group=None):
+        ref = max(float(param.norm()), base)  # масштаб от max(‖p‖, ‖p₀‖)
         ratio = float(step.norm()) / max(ref, 1e-12)
-        clipped = ratio > max_ratio
-        if clipped:
-            step = step * (max_ratio / ratio)
+        step, clipped = _trust(step, ratio, group, key)
         param += step
-        out[f"{key}_ratio"] = ratio
+        out[f"{key}_ratio"] = ratio  # сырой относительный шаг правила — диагностика обусловленности
         out[f"{key}_clipped"] = clipped
 
     if dS is not None and lr_S > 0:
-        _step(machine.S, lr_S * 0.5 * (dS + dS.T) * machine.mask, "S", bn["S"])
+        _step(machine.S, lr_S * 0.5 * (dS + dS.T) * machine.mask, "S", bn["S"], "S")
     if dA is not None and lr_A > 0:
-        _step(machine.A, lr_A * 0.5 * (dA - dA.T) * machine.mask, "A", bn["A"])
+        _step(machine.A, lr_A * 0.5 * (dA - dA.T) * machine.mask, "A", bn["A"], "A")
     if dE is not None and lr_E > 0:
         for l, e in enumerate(machine.E_r):
-            _step(e, lr_E * dE[l], f"E{l}", bn["E_r"][l])
+            _step(e, lr_E * dE[l], f"E{l}", bn["E_r"][l], "E")
     if dXi is not None and lr_Xi > 0:
         for l, xi in enumerate(machine.Xi):
-            _step(xi, lr_Xi * dXi[l], f"Xi{l}", bn["Xi"][l])
+            _step(xi, lr_Xi * dXi[l], f"Xi{l}", bn["Xi"][l], "Xi")
         machine.normalize_prototypes()
     return out
 
@@ -256,7 +329,7 @@ class LocalAdam:
         return float(step.norm() / param.norm().clamp_min(1e-12))
 
     @torch.no_grad()
-    def apply(self, dS=None, dA=None, dE=None, dXi=None, dc=None, dg=None, dk=None, dEin=None,
+    def apply(self, dS=None, dA=None, dE=None, dXi=None, dc=None, dg=None, dk=None, dEin=None, dgd=None,
               decay_S=0.0, decay_A=0.0, decay_E=0.0) -> dict:
         m = self.m
         self.t += 1
@@ -287,13 +360,16 @@ class LocalAdam:
             out["c_step"] = self._step("c", m.c, dc)
             m.c.clamp_(-m.cfg.c_max, m.cfg.c_max)
             tot = m.c.abs().sum(1, keepdim=True)
-            m.c *= torch.where(tot > m.cfg.c_sum_max, m.cfg.c_sum_max / tot, torch.ones_like(tot))
+            m.c *= torch.where(tot > m.c_sum_cap, m.c_sum_cap / tot, torch.ones_like(tot))
         if dg is not None and m.g_adapt is not None:
             out["g_step"] = self._step("g", m.g_adapt, dg)
             m.g_adapt.clamp_(min=0.0)
         if dk is not None and m.kappa is not None:
             out["kappa_step"] = self._step("kappa", m.kappa, dk)
             m.kappa.clamp_(0.0, m.cfg.kappa_max)
+        if dgd is not None and m.Xi:
+            out["gd_step"] = self._step("gd", m.dam_g, dgd)
+            m.dam_g.clamp_(min=0.0)
         return out
 
 

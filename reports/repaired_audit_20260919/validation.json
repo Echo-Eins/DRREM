@@ -1,0 +1,10 @@
+{
+  "recorded_utc": "2026-09-19T23:50:35.071138+00:00",
+  "report_local_links_checked": 10,
+  "source_hash_matches_snapshot": true,
+  "historical_last_clean_replay_tolerance": 1e-06,
+  "historical_fixed_all_replay_tolerance": 1e-06,
+  "diagnostic_consistency_checks": "passed",
+  "script_compilation": "passed",
+  "training_source_modified_by_audit": false
+}

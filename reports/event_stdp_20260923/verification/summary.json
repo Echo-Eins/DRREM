@@ -1,0 +1,23 @@
+{
+  "tests": "71/71 passed",
+  "sealed_checkpoints_match_pre_test_hashes": true,
+  "python": "3.12.3",
+  "torch": "2.11.0+cu130",
+  "gpu": "NVIDIA GB10",
+  "source_hashes": {
+    "main.py": "d57bd51f0b9f078d22b27ad1da81dc66608ea2fa2e6e42334f7a5a80e83b24ce",
+    "README.md": "49174868da75f20725b80c52da2665cd2676b5c70ea30da459a8da09cf418c4d",
+    "docs/EVENT_STDP.md": "ca3dba17615be39cf79f9c7035381c8c3aff3136c62f30d992ffd8ec109fbaa4",
+    "drrem/core/event_stdp.py": "f4ab17f0617dd5e933a9d9ee13064f9102833f2295c67594848d5fc469f7b4cc",
+    "drrem/spiking_rrem.py": "88d4b1bce74c3b09a86dc3d08e00ea7d17dad0ff4a95be2a271294ccdc1a7f8a",
+    "drrem/data/protocol.py": "5b0a3e98b32bddfc0fc419d564aaef0fcb6361ee700859072c9de1c73fada60e",
+    "tests/test_event_stdp.py": "4fc4bff89f245d078da335c9024fc4f7a0ea4d3fda2fa7f77c5fb1d870456ef4",
+    "scripts/train_spiking_stdp.py": "babd7e981df868774506fcbb04dc0dd668aa207389f3e0c6fa6fdc482cc8809a",
+    "scripts/sample_spiking_stdp.py": "fbcbdcbd39d35e3fc5903dd82f5248219580639b57f004d3a4b4eb69174cc3c6",
+    "scripts/probe_spike_order.py": "af798a6c6faa2e39cd694c5b932bff24c02c41a0379e2450d7645972368ffd72",
+    "scripts/assess_spike_order.py": "cf297e3aed70fc840adc93f63d3ed44ee61bf53268e846821e496245c55e918c",
+    "scripts/probe_spiking_features.py": "b7cb4c54f4fc3adc341ee651eb34d8358ca45e2ce153f39175e28553da2925ea",
+    "scripts/assess_spiking_language.py": "cfcfbc9a38112e798b414e864cbbe7d1a938bd388fbcbb0ad9bd24f1d00cf9ed",
+    "scripts/render_spike_report.py": "9da644026ae524b8b6091e5cea7012ba8daee29824c6041c4f7193eac260b245"
+  }
+}

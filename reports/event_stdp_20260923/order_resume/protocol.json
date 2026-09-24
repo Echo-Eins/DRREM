@@ -1,0 +1,63 @@
+{
+  "config": {
+    "N": 32,
+    "L": 2,
+    "hops": 2,
+    "horizons": 1,
+    "delays": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "tau_membrane": 4.0,
+    "tau_adaptation": 32.0,
+    "tau_readout": 8.0,
+    "adaptation": 2.0,
+    "refractory": 1,
+    "threshold": 1.0,
+    "tonic": 1.5,
+    "input_gain": 8.0,
+    "recurrent_gain": 0.6,
+    "readout_gain": 4.0,
+    "target_rate": 0.15,
+    "homeostasis": 0.0,
+    "core_lr": 0.001,
+    "head_lr": 0.01,
+    "input_credit": 0.1,
+    "tie_input": false,
+    "freeze_core": false,
+    "freeze_head": false,
+    "learn_input": false,
+    "rule": "stdp",
+    "learning": "resume",
+    "teacher_gain": 1.0,
+    "seed": 234,
+    "device": "cpu",
+    "dtype": "float32",
+    "stdp": {
+      "tau_plus": 4.0,
+      "tau_minus": 8.0,
+      "a_plus": 1.0,
+      "a_minus": 0.5,
+      "tau_eligibility": 64.0
+    }
+  },
+  "tail": 4,
+  "steps": 300,
+  "train_seeds": [
+    10000,
+    10299
+  ],
+  "dev_seeds": [
+    90000,
+    90001,
+    90002,
+    90003
+  ],
+  "source_hashes": {
+    "drrem/spiking_rrem.py": "8eba9eaf27e5873b2972ef19af4f64204b724843c1af0f4757c94a74c0aa61ef",
+    "drrem/core/event_stdp.py": "03e853f79168f0d047f4d1e23500c04e2475d7b452f30b9f09961d203c075826",
+    "/home/echoens/Coding/Python/DRREM/scripts/probe_spike_order.py": "af798a6c6faa2e39cd694c5b932bff24c02c41a0379e2450d7645972368ffd72"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "checked_at_utc": "2026-09-20T11:27:32.350003+00:00",
+  "updates": 5,
+  "seen_response_bytes": 106367,
+  "seen_mtp_targets": 842166,
+  "test_opened": false,
+  "finite_parameters_and_optimizer": true,
+  "checkpoint_bytes": 933251893,
+  "optimizer_states": [
+    {
+      "parameter_index": 0,
+      "step": 5,
+      "shape": [
+        4,
+        3072,
+        3072
+      ]
+    },
+    {
+      "parameter_index": 1,
+      "step": 5,
+      "shape": [
+        4,
+        3072,
+        3072
+      ]
+    },
+    {
+      "parameter_index": 2,
+      "step": 5,
+      "shape": [
+        8,
+        256,
+        1024
+      ]
+    },
+    {
+      "parameter_index": 3,
+      "step": 5,
+      "shape": [
+        8,
+        256
+      ]
+    }
+  ],
+  "source_hashes_match": true,
+  "pid": 1545338
+}

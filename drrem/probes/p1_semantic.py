@@ -28,7 +28,9 @@ from drrem.diagnostics.align import cos, summarize, tied_asym_grad, tied_sym_gra
 TWIN4 = PhaseConfig(H_free=4, H_nudge=4, beta=0.2, nudge_from="step_start", twin=True)
 TWIN8 = PhaseConfig(H_free=8, H_nudge=8, beta=0.2, nudge_from="step_start", twin=True)
 SEQ16 = PhaseConfig(H_free=16, H_nudge=16, beta=0.2, nudge_from="free_end", twin=False)
-LEARN = LearnConfig(lr_S=0.01, lr_A=0.01, lr_E=0.05, decay_S=1e-4, decay_A=1e-4, decay_E=1e-4)
+# распад выключен: применялся на каждое обновление (256 на батч) и стирал память быстрее, чем
+# правило её строило — отчёт P1 §19; прежние числа 256-машины (лучшее 3,654) получены с ним
+LEARN = LearnConfig(lr_S=0.01, lr_A=0.01, lr_E=0.05, decay_S=0.0, decay_A=0.0, decay_E=0.0)
 # 512×3: распад 1e-4 за 12,8 тыс. обновлений стирал нормы (17 → 5); контроль нормы — синаптическое масштабирование
 LEARN_BIG = LearnConfig(lr_S=0.01, lr_A=0.01, lr_E=0.05, decay_S=0.0, decay_A=0.0, decay_E=0.0)
 # гипотеза (б): тот же локальный сигнал, по-параметрная адаптивная нормировка шага (как у двойника) — провалилась (§12)
@@ -60,6 +62,32 @@ LEARN_S_CPROFILE = LearnConfig(optimizer="adam", adam_lr=3e-4, adam_groups=("E",
                                decay_S=0.0, decay_E=0.0, neuron_steps="sgd", c_profile=True)
 LEARN_SA_SGD = LearnConfig(lr_S=0.01, lr_A=0.01, lr_E=0.05, freeze=("Xi", "c", "g", "k", "Ein"), decay_S=0.0, decay_A=0.0, decay_E=0.0)
 
+
+# доверительный шаг по группам: норма шага приводится К цели, направление локального правила не меняется.
+# Мотив — измеренные относительные шаги за обновление на 512×3: S 1,7e-3, чтение под Adam 1,1e-3,
+# прототипы 3,0e-5 / 1,9e-6 / 1,9e-7 (уровни 2–3 фактически заморожены), обрезка сверху не срабатывает
+# ни разу. Adam лечит это по координатам и потому раздувает шум локального сигнала (§12); групповая
+# нормировка масштаба его не трогает. Риск, который и проверяется: для группы со слабым сигналом
+# фиксированный относительный шаг — случайное блуждание (§16), поэтому Ξ вынесено в отдельный контроль,
+# а свойства нейрона c/g/κ остаются замороженными.
+def _trust_cfg(groups: tuple[str, ...], r: float, local: bool) -> LearnConfig:
+    if local:  # Adam нигде: полностью локальная машина S + A + Ξ + чтение
+        return LearnConfig(lr_S=0.01, lr_A=0.01, lr_E=0.05, freeze=("c", "g", "k", "Ein"),
+                           decay_S=0.0, decay_A=0.0, decay_E=0.0,
+                           step_mode="trust", trust_ratio=r, trust_groups=groups)
+    return LearnConfig(optimizer="adam", adam_lr=3e-4, adam_groups=("E",), lr_S=0.01, use_A=False,
+                       freeze=("A", "c", "g", "k", "Ein"), decay_S=0.0, decay_E=0.0,
+                       step_mode="trust", trust_ratio=r, trust_groups=groups)
+
+
+TRUST_LEARN = {
+    "trust_S": _trust_cfg(("S",), 1e-3, False),  # S к цели, чтение Adam, Ξ как было — против win_S_Xi_adamE (3,326)
+    "trust_S_Xi": _trust_cfg(("S", "Xi"), 1e-3, False),  # + прототипы подняты с 1,9e-7 к цели
+    "trust_local": _trust_cfg(("S", "A", "E", "Xi"), 1e-3, True),  # без Adam — против win_SAXi_sgd (3,603)
+    "trust_local_r3e4": _trust_cfg(("S", "A", "E", "Xi"), 3e-4, True),
+    "trust_local_r3e3": _trust_cfg(("S", "A", "E", "Xi"), 3e-3, True),
+}
+
 # гомеостаз в ~50 раз медленнее обучения: 2e-5 за обновление ≈ 5e-3 за батч из 256 обновлений
 BASE = dict(N=256, trace_taus=(2.0, 8.0, 32.0, 128.0), trace_gain=0.5, homeo=True, homeo_target=0.10, homeo_rate=2e-5,
             scaling=True, scale_max_ratio=4.0)
@@ -80,7 +108,45 @@ BIG = dict(N=512, L=3, horizons=((1, 2, 3, 4), H16, H16), horizon_weight="inv",
 BIG_DELAY = {**BIG, "delay_lags": (1, 2, 3, 4), "delay_gain": 0.25, "c_per_target": True,
              "level_weights": (0.7, 0.2, 0.1), "kappa_max": 2.0, "act_scaling": False}
 
+# ---------------------------------------------------------------- машина после ревизии README (v4)
+# Что изменено против BIG_DELAY и почему (каждый пункт — измеренный дефект, не вкус):
+#   rho="gate"        содержание ≠ маршрутизация (README §14): сообщение u = tanh(z) ⊙ r, r = q/mean_уровня(q).
+#                     Мультипликативно ⇒ конъюнкции (проверено тестом: отклик на два входа ≠ сумме откликов,
+#                     у жёсткой сигмоиды в линейной области он равен ей точно — отсюда аддитивный потолок 3,32);
+#                     ‖r‖ = √N ⇒ латеральное торможение §13 и постоянный бюджет сообщения по уровню;
+#                     r > 0 ⇒ нет мёртвой зоны ρ'=0, в которой сидело 21–40 % единиц.
+#   readout_bias      свободный член чтения: априори байт больше не надо вкладывать в веса.
+#   tie_readout       E_input = E_output (спецификация прототипа README), амплитуда — нормировкой строки.
+#   c_init="random"   популяционный код по лагам: линейный пробник достаёт x[t−2..4] на 0,92 против 0,38–0,46.
+#   c_sum_max_ratio   предел громкости профиля от начальной суммы: нет 25-процентного шока при обучении c.
+#   learn_dam_gain    усиление плотной памяти обучаемо, прототипы не нормируются на единицу: её ток был
+#   dam_normalize     заперт на 1 % от рекуррентного (0,48 против 39) конструктивно, а не по недоученности.
+#   homeo=False       гомеостаз порога больше не нужен: бюджет держит вентиль.
+V4 = {**BIG_DELAY, "rho": "gate", "gate_T": 1.0, "readout_bias": True, "tie_readout": True, "tie_norm": True,
+      "c_init": "random", "c_sum_max_ratio": 1.0, "learn_dam_gain": True, "dam_normalize": "none",
+      "homeo": False, "learn_E_in": False,  # вход учится через общий код чтения, отдельного E_in нет
+      "alpha": 0.25}  # у вентиля нет мёртвой зоны, гасившей шаг: при α=0,5 сходимость теряется при ‖S‖ ≈ 4×
+# контроль: цель обучения совпадает с измеряемой метрикой (сейчас на неё работает лишь 34 % подталкивания)
+V4_H1 = {**V4, "horizons": ((1,), (1,), (1,)), "level_weights": (1.0, 0.0, 0.0)}
+# полностью локальная: Adam нигде, масштабы групп выравнивает доверительный шаг
+LEARN_V4 = LearnConfig(lr_S=0.01, lr_A=0.01, lr_E=0.05, lr_gd=0.01, freeze=("c", "g", "k", "Ein"),
+                       decay_S=0.0, decay_A=0.0, decay_E=0.0,
+                       step_mode="trust", trust_ratio=1e-3, trust_groups=("S", "A", "E", "Xi", "gd"),
+                       trust_max_gain=50.0)  # без предела прототипы уровня 3 усиливались в 1435 раз
+
 SETS = {
+    "v4": {
+        "physics": {
+            "v4_gate": (MachineV2Config(**V4, frontend="embed"), TWIN8),
+            "v4_gate_h1": (MachineV2Config(**V4_H1, frontend="embed"), TWIN8),
+            "v3_baseline": (MachineV2Config(**BIG_DELAY, frontend="embed"), TWIN8),
+        },
+        "learn": {
+            "v4_gate": (MachineV2Config(**V4, frontend="embed"), TWIN8),
+            "v4_gate_h1": (MachineV2Config(**V4_H1, frontend="embed"), TWIN8),
+        },
+    },
+
     "bigdelay": {
         "physics": {"bigdelay_embed_twin8": (MachineV2Config(**BIG_DELAY, frontend="embed"), TWIN8)},
         "learn": {
@@ -113,6 +179,11 @@ SETS = {
             "hyp_S_cprofile": (MachineV2Config(**BIG_DELAY, frontend="embed"), TWIN8),  # S + c как профиль (фикс. громкость)
             "win_S_Xi_adamE": (MachineV2Config(**BIG_DELAY, frontend="embed"), TWIN8),  # победитель: S + прототипы, чтение Adam (длинный прогон)
             "win_SAXi_sgd": (MachineV2Config(**BIG_DELAY, frontend="embed"), TWIN8),  # полностью локальный: S + A + прототипы + чтение SGD
+            # та же конфигурация победителя, но профиль нейрона по лагам разный у разных нейронов
+            # (популяционный код вместо общего мешка; суммарная громкость Σ|c| та же, c по-прежнему заморожен).
+            # Мотив — линейный пробник на необученной машине: при общем профиле байт x[t−2..4] восстанавливается
+            # из состояния на 0,38–0,46, при разных профилях — на 0,92 (drrem/diagnostics/order_probe.py)
+            "crand_S_Xi": (MachineV2Config(**{**BIG_DELAY, "c_init": "random"}, frontend="embed"), TWIN8),
         },
     },
     # аудит §3–4: смещение векторно-полевой EqProp при A ≠ 0 и его исправление транспонированным якобианом;
@@ -127,6 +198,10 @@ SETS = {
             "g0.25_adjoint_shared_c": (MachineV2Config(**{**BIG_DELAY, "c_per_target": False}, gamma_in=0.25, nudge_adjoint=True), TWIN8),
         },
         "learn": {},
+    },
+    "trust": {  # доверительный шаг по группам вместо обрезки сверху (§20)
+        "physics": {},
+        "learn": {name: (MachineV2Config(**BIG_DELAY, frontend="embed"), TWIN8) for name in TRUST_LEARN},
     },
     "small": {
         "physics": {
@@ -161,16 +236,24 @@ SETS = {
 # ----------------------------------------------------------------------------- физика
 
 
+def _mean_cos(pairs) -> float:
+    """Среднее по уровням, У КОТОРЫХ ЕСТЬ градиент: уровень с нулевым весом не должен занижать среднее."""
+    vals = [cos(d, g) for d, g in pairs if g is not None and float(g.norm()) > 0]
+    return sum(vals) / len(vals) if vals else float("nan")
+
+
 def measure_step2(machine: MachineV2, state, batch, t: int, end, phase: PhaseConfig, gen: torch.Generator, per_sample: int = 4) -> tuple[dict, object]:
     cfg = machine.cfg
     act = batch.active[:, t]
     Y, V = make_targets(batch.x, t, cfg.H_max, batch.P, end)
     m = act & V[:, 0]
-    I = machine.input_drive(batch.x, t)
     um = machine.unit_mask(state, act)
     lm = state.tick
     x0 = state.x.detach()
-    with machine.instrumented() as (W, E_r, Xi, c, gad, kap):
+    with machine.instrumented() as (W, E_r, Xi, c, gad, kap, _gd):
+        # вход считается ВНУТРИ графа: при tie_readout он идёт через ту же строку чтения, и снаружи
+        # автоград не увидел бы второй путь — прибор мерил бы ту же неполную величину, что и правило
+        I = machine.input_drive(batch.x, t)
         xbar = None if c is None else (lambda xb: xb[:, 0] if machine.L_t == 1 else xb)(torch.einsum("lmi,bmi->bli", c, state.traces))
         bias = None if gad is None else -gad[None] * state.adapt
         if kap is not None:
@@ -180,19 +263,22 @@ def measure_step2(machine: MachineV2, state, batch, t: int, end, phase: PhaseCon
         s0 = machine.rho(x_free)
         loss_b = machine.loss_per_sample(s0, Y, V, lm)
         loss = loss_b[m].mean()
-        params = [W, *E_r, *Xi] + ([c] if c is not None else []) + ([gad] if gad is not None else []) + ([kap] if kap is not None else [])
+        params = ([W, *E_r, *Xi] + ([c] if c is not None else []) + ([gad] if gad is not None else [])
+                  + ([kap] if kap is not None else []) + ([_gd] if machine.Xi else []))
         grads = torch.autograd.grad(loss, params, retain_graph=True)
         G_W, G_E, G_Xi = grads[0], grads[1 : 1 + len(E_r)], grads[1 + len(E_r) : 1 + len(E_r) + len(Xi)]
         rest = list(grads[1 + len(E_r) + len(Xi) :])
         G_c = rest.pop(0) if c is not None else None
         G_g = rest.pop(0) if gad is not None else None
         G_k = rest.pop(0) if kap is not None else None
+        G_gd = rest.pop(0) if machine.Xi else None
         per_idx = torch.nonzero(m).flatten()[:per_sample]
         per_G = [torch.autograd.grad(loss_b[b], [W], retain_graph=True)[0].detach() for b in per_idx]
     mask = machine.mask
     gS = -(tied_sym_grad(G_W) * mask)
     gA = -(tied_asym_grad(G_W, cfg.gamma_in) * mask)
     x_free, s0 = x_free.detach(), s0.detach()
+    I = machine.input_drive(batch.x, t).detach()
     with torch.no_grad():
         r = twin_step2(machine, state, I, Y, V, phase, act)
         xbar = r.xbar
@@ -201,10 +287,13 @@ def measure_step2(machine: MachineV2, state, batch, t: int, end, phase: PhaseCon
         dS_nox = P2.contrast2(r.s_neg, r.sb, be, None, m, cfg.N)
         dA = P2.wedge2(r.s_neg, r.sb, be, xbar, m, cfg.N)
         dE = P2.delta_readout2(machine, r.s0, Y, V, m, lm)
+        if cfg.tie_readout and machine.frontend is None:
+            dE[0] = dE[0] + P2.tie_input_update(machine, batch.x[:, t], r.s_neg, r.sb, be, m)
         dXi = P2.dam_contrast(machine, r.s_neg, r.sb, be, m)
         dc = P2.c_update(machine, r.s_neg, r.sb, state.traces, be, m) if state.traces is not None else None
         dg = P2.adapt_gain_update(r.s_neg, r.sb, state.adapt, be, m) if state.adapt is not None else None
         dk = P2.flywheel_gain_update(r.s_neg, r.sb, state.err, be, m) if state.err is not None else None
+        dgd = P2.dam_gain_update(machine, r.s_neg, r.sb, be, m) if machine.Xi else None
         # согласие знаков по координатам: доля координат (среди |∇| выше медианы), где знак правила совпал
         gS_flat, dS_flat = (gS * mask).flatten(), (dS * mask).flatten()
         big = gS_flat.abs() > gS_flat.abs()[mask.flatten() > 0].median()
@@ -229,16 +318,17 @@ def measure_step2(machine: MachineV2, state, batch, t: int, end, phase: PhaseCon
             "slope_S": float((dS * mask * gS).sum() / (gS * gS).sum().clamp_min(1e-30)),
             "sign_agree_S": sign_agree,
             "cos_A": cos(dA * mask, gA) if cfg.gamma_in > 0 else float("nan"),
-            "cos_E": sum(cos(dE[l], -G_E[l]) for l in range(cfg.L) if float(G_E[l].norm()) > 0) / cfg.L,
-            "cos_Xi": (sum(cos(dXi[l], -G_Xi[l]) for l in range(cfg.L) if float(G_Xi[l].norm()) > 0) / cfg.L) if dXi else float("nan"),
+            "cos_E": _mean_cos([(dE[l], -G_E[l]) for l in range(cfg.L)]),
+            "cos_Xi": _mean_cos([(dXi[l], -G_Xi[l]) for l in range(cfg.L)]) if dXi else float("nan"),
             "cos_c": cos(dc, -G_c) if dc is not None else float("nan"),
             "cos_g": cos(dg, -G_g) if dg is not None else float("nan"),
             "cos_kappa": cos(dk, -G_k) if dk is not None else float("nan"),
+            "cos_dam_gain": cos(dgd, -G_gd) if dgd is not None else float("nan"),
             "memory_swap": memory_swap(machine, state, I, act, phase, gen)[0],
             "fp_resid_free_med": float(fp.median()),
             "jacobian_radius": jr,
-            "sat_frac": float((s0[um] >= 1).float().mean()),
-            "active_frac": float((s0[um] > 0).float().mean()),
+            "sat_frac": float(machine.saturated(x_free)[um].float().mean()),
+            "active_frac": float(machine.active(x_free)[um].float().mean()),
             "tick_rate_L2": float(state.tick[act, 1].float().mean()) if cfg.L > 1 else float("nan"),
             "tick_rate_L3": float(state.tick[act, 2].float().mean()) if cfg.L > 2 else float("nan"),
         }
@@ -284,7 +374,7 @@ def run_physics(name: str, mcfg: MachineV2Config, phase: PhaseConfig, data: Open
     g = lambda k: s[k]["mean"]
     print(f"{name:20s} cosS={g('cos_S'):+.3f} (без следа {g('cos_S_no_trace_term'):+.3f}) sign={g('sign_agree_S'):.2f} per={g('cos_S_per_sample'):+.3f} "
           f"pshuf={g('cos_S_per_sample_shuffled'):+.3f} slope={g('slope_S'):.3f} | cosA={g('cos_A'):+.3f} cosE={g('cos_E'):+.3f} "
-          f"cosXi={g('cos_Xi'):+.3f} cos_c={g('cos_c'):+.3f} cos_g={g('cos_g'):+.3f} cos_k={g('cos_kappa'):+.3f} | mem={g('memory_swap'):.3f} "
+          f"cosXi={g('cos_Xi'):+.3f} cos_c={g('cos_c'):+.3f} cos_g={g('cos_g'):+.3f} cos_k={g('cos_kappa'):+.3f} cos_gd={g('cos_dam_gain'):+.3f} | mem={g('memory_swap'):.3f} "
           f"fp={g('fp_resid_free_med'):.3f} ρJ={g('jacobian_radius'):.2f} sat={g('sat_frac'):.2f} tick2={g('tick_rate_L2'):.2f} tick3={g('tick_rate_L3'):.2f} [{time.time() - t0:.0f}s]")
     return summary
 
@@ -293,10 +383,12 @@ def run_physics(name: str, mcfg: MachineV2Config, phase: PhaseConfig, data: Open
 
 
 def run_learning(name: str, mcfg: MachineV2Config, phase: PhaseConfig, data: OpenOrcaBytes, out_dir: Path, device: str,
-                 steps: int, eval_every: int, learn: LearnConfig = LEARN) -> None:
+                 steps: int, eval_every: int, learn: LearnConfig = LEARN, eval_batches_n: int = 20) -> None:
+    """eval_batches_n: на 3 батчах σ бутстрапа = 0,024 бита, то есть различия меньше 0,07 нечитаемы;
+    на 20 батчах σ ≈ 0,009. Оценка дешевле обучения, экономить на ней было ошибкой."""
     torch.manual_seed(mcfg.seed)
     machine = MachineV2(mcfg, device)
-    eval_batches = [b.to(device) for b in data.heldout_batches(3, 64, seed=2)]
+    eval_batches = [b.to(device) for b in data.heldout_batches(eval_batches_n, 64, seed=2)]
     if machine.frontend is not None:
         b0 = eval_batches[0]
         machine.frontend.calibrate(b0.x[:, max(0, b0.P - mcfg.cnn_window) : b0.P])
@@ -309,7 +401,7 @@ def run_learning(name: str, mcfg: MachineV2Config, phase: PhaseConfig, data: Ope
         if "heldout" in rec:
             h, sp = rec["heldout"], rec["spectral"]
             prof = " | ".join(",".join(f"{v:.2f}" for v in row[:4]) + ("…" if len(row) > 4 else "") for row in h["bpb_level_horizon"])
-            print(f"  [{name}] step {rec['step']:4d} train_h1={rec['train_bpb']:.3f} obj={rec['train_objective']:.3f} h1={h['bpb_h1']:.3f} ΔCswap={h['memory_dC_bits']:+.3f} ρJ={h['jacobian_radius_med']:.2f} prof=[{prof}] "
+            print(f"  [{name}] step {rec['step']:4d} train_h1={rec['train_bpb']:.3f} obj={rec['train_objective']:.3f} h1={h['bpb_h1']:.3f}±{h.get('bpb_h1_sigma', float('nan')):.3f} ΔCswap={h['memory_dC_bits']:+.3f} ρJ={h['jacobian_radius_med']:.2f} prof=[{prof}] "
                   f"hops={h['hop_curve_bpb'][0]:.2f}→{h['hop_curve_bpb'][-1]:.2f} mem={h['memory_swap_med']:.3f} sat={h['sat_frac']:.2f} "
                   f"ρW={sp['W_rho']:.2f} θ={sp['theta_mean']:+.2f} ticks={h['tick_rate']} seg|tick={h['tick_after_segment_rate']} "
                   f"(base {h['segment_base_rate']:.2f}) c={sp.get('c_by_scale')} g={sp.get('g_adapt_mean', float('nan')):.2f} [{rec['elapsed_s']:.0f}s]")
@@ -388,6 +480,8 @@ def main() -> None:
     ap.add_argument("--only", nargs="*", default=None)
     ap.add_argument("--steps", type=int, default=300)
     ap.add_argument("--eval-every", type=int, default=50)
+    ap.add_argument("--eval-batches", type=int, default=20, help="батчей отложенной выборки на оценку (3 даёт σ=0,024 бита — слишком грубо)")
+    ap.add_argument("--rep", type=int, default=0, help="повтор с другим seed: сдвигает seed машины и потока данных, имя получает суффикс")
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     args = ap.parse_args()
     out_dir = Path(args.out)
@@ -400,10 +494,19 @@ def main() -> None:
     for name, (mcfg, phase) in cfgs.items():
         if args.only and name not in args.only:
             continue
+        if args.rep:
+            from dataclasses import replace as _rep
+            mcfg = _rep(mcfg, seed=mcfg.seed + 1000 * args.rep)
+            name = f"{name}_r{args.rep}"
         if args.stage == "physics":
             run_physics(name, mcfg, phase, data, out_dir, args.device)
         else:
             learn_cfg = LEARN_BIG if args.set.startswith("big") else LEARN
+            base = name[: name.rindex("_r")] if args.rep else name
+            if args.set == "v4":
+                learn_cfg = LEARN_V4
+            if args.set == "trust":
+                learn_cfg = TRUST_LEARN[base]
             if args.set == "hyp":
                 learn_cfg = {"hyp_adam": LEARN_BIG_ADAM, "hyp_adam_adjoint": LEARN_BIG_ADAM, "hyp_adjoint": LEARN_BIG,
                              "hyp_adamE": LEARN_BIG_ADAM_E, "hyp_Eonly_sgd": LEARN_EONLY_SGD, "hyp_Eonly_adam": LEARN_EONLY_ADAM,
@@ -413,9 +516,10 @@ def main() -> None:
                              "hyp_Sonly_sgd": LEARN_SONLY_SGD, "hyp_SA_sgd": LEARN_SA_SGD,
                              "hyp_S_neuron_sgdsteps": LEARN_S_NEURON_SGDSTEPS, "hyp_full_sgd": LEARN_FULL_SGD,
                              "hyp_S_rowadam": LEARN_S_ROWADAM, "hyp_S_cprofile": LEARN_S_CPROFILE,
-                             "win_S_Xi_adamE": LEARN_S_XI,
-                             "win_SAXi_sgd": LearnConfig(lr_S=0.01, lr_A=0.01, lr_E=0.05, freeze=("c", "g", "k", "Ein"), decay_S=0.0, decay_A=0.0, decay_E=0.0)}[name]
-            run_learning(name, mcfg, phase, data, out_dir, args.device, args.steps, args.eval_every, learn=learn_cfg)
+                             "win_S_Xi_adamE": LEARN_S_XI, "crand_S_Xi": LEARN_S_XI,
+                             "win_SAXi_sgd": LearnConfig(lr_S=0.01, lr_A=0.01, lr_E=0.05, freeze=("c", "g", "k", "Ein"), decay_S=0.0, decay_A=0.0, decay_E=0.0)}[base]
+            run_learning(name, mcfg, phase, data, out_dir, args.device, args.steps, args.eval_every, learn=learn_cfg,
+                         eval_batches_n=args.eval_batches)
     report(out_dir)
 
 
